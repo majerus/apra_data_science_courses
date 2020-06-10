@@ -1,0 +1,502 @@
+---
+title: "NEDRA R/RStudio Workshop"
+date: 6/9/2020
+output:
+ html_document:
+    toc: true
+    toc_depth: 2
+---
+
+# Slides
+
+The slides for this webinar are available [here](https://docs.google.com/presentation/d/11GWOihHr0eaIKlly4DwgspvRJUBx3C0IDWcu8kgVkQw/edit#slide=id.g1ae5e7a9c7_0_0).
+
+
+```{r setup, include=FALSE}
+# set rmarkdown options
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+# load R packages
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(plotly)
+library(DT)
+library(leaflet)
+library(scales)
+```
+
+# Load Data {.tabset}
+
+First, let's take a look at the data that is available to us to start to answer these research questions. 
+
+## Loading data from .csv files
+
+**How do you read a .csv into R?**
+
+```{r load_data}
+# read in biographical data table
+bio <- read_csv("bio_data_table.csv")
+
+# read in giving data table
+giving <- read_csv("giving_data_table.csv")
+
+```
+
+You can read multiple data files into the same R session. Each of these files contain fictional data created by the `generate_data.R` script. 
+
+## Loading data from a database
+
+**Have you ever connected R to a database?**
+
+The following is an example of how to create a sample database in R and to load information from that database. More information on using databases from R can be found [here](https://db.rstudio.com/). If you use the tidyverse, you can use the same workflow with information from databases and .csv or Excel files. 
+
+```{r}
+# create database connection
+con <- DBI::dbConnect(RSQLite::SQLite(), path = ":dbname:")
+
+# put some data in our new database
+copy_to(dest = con,
+        df = bio,
+        name = "bio_table",
+        temporary = FALSE)
+
+copy_to(dest = con,
+        df = giving ,
+        name = "giving_table",
+        temporary = FALSE)
+
+# print out our table names
+db_list_tables(con)
+
+# let's take a look at the bio table
+tbl(con, "bio_table") 
+
+# we can use dplyr syntax to query a database
+# dplyr automatically converts our r code to sql
+# alternatively you can write sql code directly in rmarkdown as well
+tbl(con, "bio_table") %>% 
+  filter(state == "NC") %>% 
+  select(name, city, capacity)
+
+
+```
+
+# Data Cleaning {.tabset}
+
+## Print Data
+
+**How do you take a look at your data in R?**
+
+```{r}
+bio %>% 
+  glimpse()
+```
+
+```{r}
+giving %>% 
+  glimpse()
+```
+
+**Does anything look off about the giving data?**
+
+```{r}
+clean_names(giving)
+
+giving <- clean_names(giving)
+
+```
+
+## Missing Values
+
+### How missing values work in R
+
+R uses the `NA` code for missing values. You can test if a value is missing using the `is.na()` function. 
+
+**How many missing values are there in the deceased variable?**
+
+```{r missing_data}
+
+is.na(bio$deceased)[1:100] 
+
+sum(is.na(bio$deceased))
+
+bio %>% 
+  summarise(deceased_na = sum(is.na(deceased)))
+
+bio %>% 
+  summarise_all(funs(sum(is.na(.))))
+
+giving %>% 
+  summarise_all(funs(sum(is.na(.))))
+```
+
+**Which records are missing zip, state, lat, and lon?**
+
+```{r}
+
+bio %>% 
+  filter(is.na(zip)) %>% 
+  glimpse()
+
+```
+
+The `zipcode` package can be used to get lat/lon coordinates for each zipcode's centroid in the US. This data is also available [here](http://federalgovernmentzipcodes.us/free-zipcode-database-Primary.csv).
+
+
+## Data Cleaning
+
+You can treat character, numeric, and factor variables seperately using variations of the `select` function. 
+
+```{r data_cleaning}
+bio %>% 
+  select_if(is.numeric)
+
+bio %>% 
+  select_if(is.character)
+```
+
+**Which variable is should not be a character?**
+
+```{r}
+bio <-
+  bio %>% 
+  mutate(zip = as.numeric(zip))
+```
+
+
+**How might we recode the missing values for the deceased variable?** 
+```{r}
+bio <-
+  bio %>% 
+  mutate(deceased_missing = ifelse(is.na(deceased), "Y", "N"),
+         deceased = ifelse(is.na(deceased), "N", deceased)) 
+
+```
+
+**Are certain capacity sources missing capacity information?**
+```{r}
+# capacity source 
+bio %>% 
+  count(capacity, capacity_source)
+
+bio %>%
+  filter(is.na(capacity_source)) %>% 
+  count(capacity, capacity_source)
+
+```
+
+**Let's take a closer look at the birthday variable. What do you notice when we sort all birthdays in order?**
+```{r}
+# birthdays - let's sort all the birthdays in order 
+bio %>% 
+  select(birthday, deceased) %>% 
+  arrange(birthday)
+
+# let's take a look at the distribution of birthdays
+bio %>% 
+  select(birthday) %>%  
+  ggplot(aes(x = birthday)) +
+  geom_histogram() 
+
+# let's clean up what appears to be a missing value indicator 
+bio <-
+  bio %>%
+  mutate(birthday = if_else(birthday == as.Date("1/1/1900", "%m/%d/%Y"),
+                            as.Date(NA),
+                            birthday))
+
+# let's take another look
+bio %>% 
+  select(birthday) %>%  
+  ggplot(aes(x = birthday)) +
+  geom_histogram() 
+```
+
+
+# Data Exploration {.tabset}
+
+## Small Multiples
+```{r prelim_data_viz}
+# bio table - character variables bar plots
+bio %>% 
+  select_if(is.character) %>% 
+  select(-name, -city) %>% 
+  gather("variable", "value") %>% 
+  ggplot(aes(x = value)) +
+  geom_bar() +
+  facet_wrap(~variable, scales = "free", nrow = 2) +
+  theme(axis.text.y = element_text(size = 6)) +
+  coord_flip()
+```
+
+**What looks strange?**
+
+## More Cleaning
+```{r}
+# clean capacity ratings
+sort(unique(bio$capacity))
+
+# demo multiple cursors
+
+#  [1] ">$1k"
+#  [2] "$100k - $250k"
+#  [3] "$10k - $25k"
+#  [4] "$10M - $25M"
+#  [5] "$1k - $2.5k"
+#  [6] "$1M - $2.5M"
+#  [7] "$2.5k - $5k"
+#  [8] "$250k - $500k"
+#  [9] "$25k - $50k"
+# [10] "$25M - $50M"
+# [11] "$500k - $750k"
+# [12] "$50k - $75K"
+# [13] "$5k - $10k"
+# [14] "$5M - $10M"
+# [15] "$750k - $1M"
+# [16] "$75k - $100k" 
+
+bio <-
+  bio %>% 
+  mutate(capacity = factor(capacity, levels = c(">$1k",
+                                                "$1k - $2.5k",
+                                                "$2.5k - $5k",
+                                                "$5k - $10k",
+                                                "$10k - $25k",
+                                                "$25k - $50k",
+                                                "$50k - $75K",
+                                                "$75k - $100k",
+                                                "$100k - $250k",
+                                                "$250k - $500k",
+                                                "$500k - $750k",
+                                                "$750k - $1M",
+                                                "$1M - $2.5M",
+                                                "2.5M - $5M",
+                                                "$5M - $10M",
+                                                "$10M - $25M",
+                                                "$25M - $50M")))
+
+# let's take another look at those capacities
+bio %>% 
+  select(capacity) %>% 
+  ggplot(aes(x = capacity)) +
+  geom_bar() +
+  coord_flip()
+```
+
+## Closer Look at State 
+
+```{r}
+# state
+bio %>% 
+  filter(!is.na(state)) %>% 
+  count(state) %>% 
+  arrange(desc(n)) %>% 
+  slice(1:10) %>% 
+  ggplot(aes(x = reorder(state, n),  y = n)) +
+  geom_bar(stat = "identity", fill = "#027854") +
+  coord_flip() +
+  ggthemes::theme_tufte() +
+  labs(y = "Number of Prospects", 
+       x = "Primary Residence State",
+       title = "Prospects by State")
+
+```
+
+*Is this right? Do we need to exclude some prospects?*
+
+```{r}
+# state
+state_plot <- 
+bio %>% 
+  filter(!is.na(state),
+         deceased == "N",
+         !duplicated(household_id)) %>% 
+  count(state) %>% 
+  arrange(desc(n)) %>% 
+  slice(1:10) %>% 
+  ggplot(aes(x = reorder(state, n),  y = n)) +
+  geom_bar(stat = "identity", fill = "#027854") +
+  coord_flip() +
+  ggthemes::theme_tufte() +
+  labs(y = "Number of Prospects", 
+       x = "Primary Residence State",
+       title = "Prospects by State")
+
+ggplotly(state_plot)
+
+```
+
+## Giving Data
+
+**How would we plot the distribution of gift dates (i.e., the number of gifts per day)?**
+```{r}
+# gifts per day
+giving %>% 
+  filter(credit_type == "Hard-Credit") %>% 
+  ggplot(aes(x = gift_date)) +
+  geom_histogram()
+```
+
+**How about the distribution of gift amounts?**
+```{r}
+giving %>% 
+  filter(credit_type == "Hard-Credit") %>% 
+  ggplot(aes(x = gift_amt)) +
+  geom_histogram()
+
+giving %>% 
+  filter(credit_type == "Hard-Credit",
+         gift_amt < 1000000) %>% 
+  ggplot(aes(x = gift_amt)) +
+  geom_histogram()
+
+giving %>% 
+  filter(credit_type == "Hard-Credit",
+         gift_amt < 100000) %>% 
+  ggplot(aes(x = gift_amt)) +
+  geom_histogram()
+
+```
+
+# How does our fundraising progress compare to previous fiscal years? 
+
+*What's our first step?*
+
+```{r}
+giving <-
+  giving %>% 
+  mutate(fy = ifelse(month(gift_date) >= 7, 
+                     year(gift_date) +1, 
+                     year(gift_date)))
+
+giving %>% 
+  count(fy)
+
+giving %>% 
+  filter(credit_type == "Hard-Credit") %>% 
+  group_by(fy) %>% 
+  summarise(total_giving = dollar(sum(gift_amt)))
+
+
+  
+```
+
+*Is this it? What else might we need to account for?* 
+
+
+```{r}
+calculateFY <- function(date = Sys.Date(), date.format = "%Y-%m-%d", ytd = FALSE, fiscal.year = 2020){ 
+  
+  date <- as.Date(date, date.format)
+  
+  fy.date <- 
+    ifelse(month(date) %in% c(1:6), 
+           year(date),
+           year(date) + 1)
+  
+  if(ytd == TRUE){
+    
+    fy <- fiscal.year
+    
+    end.this.fy  <- as.Date(paste0("6/30/", fy), format = "%m/%d/%Y")
+    
+    days.left.this.fy <- end.this.fy - Sys.Date()
+    
+    end.date.fy  <- as.Date(paste0("6/30/", fy.date), format = "%m/%d/%Y")
+    
+    days.left.date.fy <- end.date.fy - date
+    
+    if(days.left.date.fy >= days.left.this.fy){
+      
+      return(fy.date)
+    
+    }else{
+        
+      return(NA)
+      
+      }
+    
+  }else{
+    
+    return(fy.date)
+    
+  }
+  
+}
+# giving$fy <- unlist(lapply(giving$gift_date, function(x) suppressWarnings(calculateFY(x, ytd = TRUE))))
+
+ytd_table <- tibble(
+  gift_date = seq(min(giving$gift_date), max(giving$gift_date), by = "day"),
+)
+
+ytd_table$fy_ytd <- unlist(lapply(ytd_table$gift_date, function(x) suppressWarnings(calculateFY(x, ytd = TRUE))))
+
+giving %>% 
+  left_join(ytd_table) %>% 
+  filter(!is.na(fy_ytd)) %>% 
+  filter(credit_type == "Hard-Credit") %>% 
+  group_by(fy_ytd) %>% 
+  summarise(total_giving = dollar(sum(gift_amt)))
+
+
+```
+
+There is a fundraising R package in development that may help and is available [here](https://github.com/crazybilly/fundRaising). 
+
+# Which prospects should we rate next? 
+
+*What might our first step be?*
+
+```{r}
+# calculate annual and total giving
+# see who is not rated or rated low
+giving_by_household_and_fy <- 
+  giving %>% 
+  group_by(household_id, fy) %>% 
+  summarise(giving = sum(gift_amt)) %>% 
+  spread(fy, giving, sep = "") %>% 
+  ungroup() %>% 
+  mutate(total_giving = rowSums(select(., contains("fy")), na.rm = TRUE))
+
+sum(duplicated(giving_by_household_and_fy$household_id))
+
+bio_with_household_giving <- 
+  bio %>% 
+  filter(!duplicated(household_id)) %>% 
+  left_join(giving_by_household_and_fy)
+
+
+bio_with_household_giving %>% 
+  filter(capacity_source %in% c(NA, "screening")) %>% 
+  filter(total_giving > 10000) %>% 
+  filter(!is.na(fy2019)) %>% 
+  arrange(desc(total_giving)) %>% 
+  select(name, capacity, capacity_source, contains("fy"), total_giving) %>% 
+  datatable(rownames = FALSE) %>% 
+  formatCurrency(columns = c(3:10), digits = 0)
+
+```
+
+# Where should we host a fundraising event? 
+
+*What might our first step be?*
+
+```{r}
+bio_with_household_giving %>% 
+  filter(total_giving > 10000) %>% 
+  filter(!is.na(fy2019)) %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  addCircleMarkers(clusterOptions = markerClusterOptions(),
+                   label = ~paste0(name, ": ", scales::dollar(total_giving)))
+
+```
+
+
+
+
+
+
+
+
