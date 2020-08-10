@@ -3,26 +3,21 @@
 # This includes three data tables: 
 # 1. bio
 # 2. giving
-# 3. prospect/engagement.  
+# 3. engagement  
 # Each data table will be available as a .csv, Excel, and a table in a database. 
 
+
+# setup----
+
+# load libraries
 library(tidyverse)
 library(randomNames)
 library(zipcode)
+library(purrr)
+library(lubridate)
 
-
-# define parameters for data set----
-
-# bio records is the number of unique ids and subsequently the number of rows in the bio table
-bio_records <- 100000
-pct_shared_household <- .4
-prob_deceased <- .1
-start_date  <- Sys.Date() - 5*365
-end_date    <- Sys.Date()
-
-
-# helper functions ----
-# make ~10% of data missing
+# helper functions
+# make ~10% of a vector missing
 insert_NAs <- function(x) {
   len <- length(x)
   n <- sample(1:floor(0.1*len), 1)
@@ -33,11 +28,25 @@ insert_NAs <- function(x) {
 
 
 
+
+# define parameters for data set----
+
+# bio_records is the number of unique ids and subsequently the number of rows in the bio table
+bio_records <- 100000
+
+# pct_shared_household defines the percetnage defines the percentage of individuals who will share a household id with another individual 
+pct_shared_household <- .4
+
+# start and end define the time period for giving and activities covered by the data
+start_date  <- Sys.Date() - 5*365
+end_date    <- Sys.Date()
+
+
 # Biographic Table (individual level) ----
 # Included variables: 
 # Id
 # Name
-# Household id or status
+# Household id 
 # City
 # State
 # Country
@@ -47,15 +56,14 @@ insert_NAs <- function(x) {
 # Capacity rating(s)
 
 # Data science questions/activities to be built in
-  # Cleaning zipcodes (+plus, international)
-  # zipcode and state mismatches
-  # Learning to exclude deceased individuals from queries, etc. 
-  # Geocoding addresses based on zipcode
-  # Handling individual vs. household level data
-  # Calculate age from birthday (build in wrong dates 1900)
-  # Bin dates - what is the distribution, how to make this information useful in modeling
-  # Imputing age if missing 
-
+# Cleaning zipcodes (+plus, international)
+# zipcode and state mismatches
+# Learning to exclude deceased individuals from queries, etc. 
+# Geocoding addresses based on zipcode
+# Handling individual vs. household level data
+# Calculate age from birthday (build in wrong dates 1900)
+# Bin dates - what is the distribution, how to make this information useful in modeling
+# Imputing age if missing 
 
 
 # id
@@ -64,7 +72,6 @@ id <- sample(1000000:9999999, bio_records, replace=F)
 # household_id
 # household records is the number of households represented in the data 
 # pct_shared_household defines the percetnage defines the percentage of individuals who will share a household id with another individual 
-
 household_records <- bio_records * (1-pct_shared_household)
 household_id <- sample(1000000:9999999, household_records, replace=F) 
 
@@ -81,7 +88,6 @@ country_data <- tibble(
 )
 
 # top three most populated cities within international countries are reprsented in the sample data
-
 country_cities <- tibble(
   country = sort(rep(
     c("Bangladesh", "Brazil", "China", "India", "Indonesia",  
@@ -139,13 +145,57 @@ zip_data <-
   mutate(city = paste0(toupper(substr(city, 1, 1)), tolower(substr(city, 2, nchar(city)))))
 
 # birthdays
-birthdays <- sort(
-  sample(
-    seq(Sys.Date() - 102*365, Sys.Date() - 20*365+69, by = "day"), 
-    prob = c(rep(.01, 3000), rep(.05, 3000), rep(.05, 3000), rep(.10, 3000), rep(.20, 3000), 
-             rep(.20, 3000), rep(.15, 3000), rep(.15, 3000), rep(.10, 3000), rep(.10, 3000)),
-    size = bio_records, 
-    replace = TRUE))
+  # correlate birthdays with prob of deceased
+probs <- 
+  tibble(prob_day =  c(rep(.01, 3000), 
+                       rep(.05, 3000), 
+                       rep(.05, 3000), 
+                       rep(.10, 3000), 
+                       rep(.20, 3000), 
+                       rep(.20, 3000), 
+                       rep(.15, 3000), 
+                       rep(.15, 3000), 
+                       rep(.10, 3000), 
+                       # limit last category to match number of days in range of birthdays
+                       rep(.10, abs(as.numeric((Sys.Date() - 102*365) - (Sys.Date() - 20*365) + 9*3000))+1)),         
+         days = seq(Sys.Date() - 102*365, Sys.Date() - 20*365, by = "day"),
+         prob_deceased =  c(rep(.95, 3000), 
+                            rep(.85, 3000), 
+                            rep(.50, 3000), 
+                            rep(.40, 3000), 
+                            rep(.20, 3000), 
+                            rep(.10, 3000), 
+                            rep(.05, 3000), 
+                            rep(.05, 3000), 
+                            rep(.025, 3000), 
+                            # limit last category to match number of days in range of birthdays
+                            rep(.025, abs(as.numeric((Sys.Date() - 102*365) - (Sys.Date() - 20*365) + 9*3000))+1))
+  )
+
+
+birthday <- tibble(birthday = sort(sample(seq(Sys.Date() - 102*365, Sys.Date() - 20*365, by = "day"), 
+                             prob = probs$prob_day, 
+                             size = bio_records, 
+                             replace = TRUE)))
+
+birthday <- 
+  birthday %>% 
+  left_join(probs, by = c("birthday" = "days")) %>% 
+  mutate(decade = round(year(birthday), -1))
+
+birthday$deceased <-  
+           birthday$prob_deceased %>%
+           map_chr(~ sample(c("Y", "N"), 
+                            size = 1, 
+                            prob = c(.x, 1-.x),
+                            replace = TRUE))
+
+# make birthdays random within decade before joining on household id so that households are not compromised of adjacent birthdays
+birthday <-
+  birthday %>% 
+  group_by(decade) %>% 
+  sample_frac(size = 1, replace = FALSE)
+  
 
 
 # create bio table
@@ -153,7 +203,6 @@ bio_table <- tibble(
   id = id,
   name = randomNames(bio_records),
   household_id = household_id,
-  deceased = sample(c("Y", "N"), size = bio_records, prob = c(prob_deceased, 1-prob_deceased), replace = TRUE),
   country = country_cities_expanded$country,
   city = country_cities_expanded$city
 )
@@ -162,7 +211,8 @@ bio_table <- tibble(
 bio_table <- 
   bio_table %>% 
   arrange(household_id) %>% 
-  bind_cols(birthday = birthdays)
+  bind_cols(birthday = birthday$birthday,
+            deceased = birthday$deceased)
 
 # add zips for domestic addresses
 bio_table$zip <- ifelse(bio_table$country == "United States", zips, NA)
@@ -225,8 +275,27 @@ bio_table$capacity_source <- sample(x = c("institutional", "screening"),
                                     size = bio_records, 
                                     prob = c(.4, .6), 
                                     replace = TRUE)
-                  
- 
+
+# race 
+# race probabilities based on 2019 US Census Estimates of American population (https://www.census.gov/quickfacts/fact/table/US/PST045219)
+bio_table$race <- 
+  sample(x = c("Non-Hispanic white",
+               "Hispanic or Latino",
+               "Black or African American",
+               "Asian",
+               "Native Americans or Alska Natives",
+               "Native Hawaiians and Other Pacific Islanders",
+               "Two or more races"),
+         size = bio_records,
+         prob = c(.6,
+                  .19,
+                  .13,
+                  .06,
+                  .013,
+                  .002,
+                  .03),
+         replace = TRUE)
+    
 # inject missing data 
 bio_table$birthday[bio_table$id %in% sample(bio_table$id, bio_records*.01)] <- as.Date("1/1/1900", "%m/%d/%Y")
 
@@ -240,21 +309,29 @@ bio_table <-
 write_csv(bio_table, "bio_data_table.csv")
 
 
-  # Giving Table (gift level) ----
-  # Included variables: 
-  # Giftid 
-  # Id
-  # Credit-type (soft-credit, hard-credit) 
-  # Gift type (cash, pledge, pledge-payments) <- need to add this yet
-  # Gift date
+# Giving Table (gift level) ----
+# Included variables: 
+# Giftid 
+# Id
+# Credit-type (soft-credit, hard-credit) 
+# Gift type (cash, pledge, pledge-payments) <- need to add this yet
+# Gift date
 
-  # Fund id 
-  # Fund type (endowment, current use, restricted vs. unrestricted, etc.) 
-  # Fund name
-  # Fund description
-  
-  # Appeal type (direct mail, phonathon, etc.)
-  
+# Fund id 
+# Fund type (endowment, current use, restricted vs. unrestricted, etc.) 
+# Fund name
+# Fund description
+
+# Data science questions/activities to be built in
+# Not all people in bio table are in gift table
+# Who are non-donors? 
+#   0’s vs NAs
+# Difference between cash, pledges, pledge payments
+# What is the first gift date for the individual, household, group? With/without soft-credit?
+#   First gift, last gift, largest gift 
+# Splits and designations
+# Calendar year giving vs. fiscal year giving
+
 
 # giving data for households with two people
 tmp <- filter(bio_table, duplicated(household_id))
@@ -269,56 +346,68 @@ giving_table <- tibble(household_id = sample(households_w_two_people$household_i
                                              replace = TRUE),
                        gift_id = sample(1000000:9999999, nrow(households_w_two_people)*3, replace=F)) 
 
-giving_table <- 
-households_w_two_people %>% 
+households_w_two_people <- 
+  households_w_two_people %>% 
   left_join(giving_table) 
 
-giving_table$credit_type <- ifelse(duplicated(giving_table$gift_id), "Soft-Credit", "Hard-Credit") 
+households_w_two_people$credit_type <- ifelse(duplicated(households_w_two_people$gift_id), "Soft-Credit", "Hard-Credit") 
 
 
-# small gifts - 80% of gifts
-summary(round((rexp(nrow(giving_table)/2*.8, rate = .05)+1)*10, 0))
-amt <- round((rexp(nrow(giving_table)/2*.8, rate = .05)+1)*10, 0)
+# small gifts - 75% of gifts
+amt <- sample(1:2500, 
+              size = .75*nrow(households_w_two_people)/2, # divide by two because all gifts will be dupliced for hard and soft credit
+              replace = TRUE, 
+              prob = 2500:1)
 
-# mid size gifts - 20% of gifts
-summary(rnorm(nrow(giving_table)/2*.15, mean = 50000, sd = 10000))
-amt <- c(amt, round((rexp(nrow(giving_table)/2*.15, rate = .05)+1)*10, 0))
+# mid size gifts - 15% of gifts
+amt <- c(amt, 
+         sample(2500:50000, 
+                size = .15*nrow(households_w_two_people)/2, 
+                replace = TRUE, 
+                prob = 50000:2500))
 
-# major gifts 4.5% of gifts 
-summary(round((rexp(nrow(giving_table)/2*.045, rate = .1)+10)*10000, 0))
-amt <- c(amt, round((rexp(nrow(giving_table)/2*.045, rate = .1)+10)*10000, 0))
+# leadership size gifts - 7% of gifts
+amt <- c(amt, 
+         sample(50000:100000, 
+                size = .07*nrow(households_w_two_people)/2, 
+                replace = TRUE, 
+                prob = 100000:50000))
 
-# major gifts .5% of gifts 
-summary(round((rexp(nrow(giving_table)/2*.005, rate = .1)+10)*10000, 0))
-amt <- c(amt, round((rexp(nrow(giving_table)/2*.005, rate = .1)+10)*10000, 0))
+# major gifts 2.95% of gifts 
+amt <- c(amt,
+         sample(100000:1000000, 
+                size = .0295*nrow(households_w_two_people)/2, 
+                replace = TRUE, 
+                prob = 1000000:100000))
+
+# major gifts .05% of gifts 
+amt <- c(amt,
+         sample(1000000:10000000, 
+                size = .0005*nrow(households_w_two_people)/2, 
+                replace = TRUE, 
+                prob = 10000000:1000000))
 
 # put amounts in random order
 amt <- sample(amt, size = length(amt), replace = FALSE)
 
-# double amounts for shared households
-amt <- c(amt,amt)
 
-if(nrow(giving_table) > length(amt)) amt <- c(amt, rep(100, nrow(giving_table) - length(amt)))
+gifts <- tibble(gift_amt = amt,
+                gift_date = sample(seq(start_date, end_date, by = "day"),length(amt), replace = TRUE))
+                
+gifts <- bind_rows(gifts, gifts)
 
-amt <- sort(amt)
+# make number of rows in giving table which length of amt vector by adding necessary number of $100 gifts to amount
+if(nrow(households_w_two_people) > nrow(gifts)){
+  gifts <- bind_rows(gifts, 
+                     tibble(
+                       gift_amt = rep(100, nrow(households_w_two_people) - nrow(gifts)),
+                       gift_date = end_date))
+}
 
-giving_table <- 
-giving_table %>% 
+households_w_two_people <- 
+  households_w_two_people %>% 
   arrange(gift_id) %>% 
-  mutate(gift_amt = amt)
-
-# gift date
-dates <- sample(seq(start_date, end_date, by = "day"), nrow(giving_table)/2, replace = TRUE)
-dates <- c(dates, dates)
-dates <- sort(dates)
-
-giving_table <- 
-  giving_table %>% 
-  arrange(gift_id) %>% 
-  mutate(gift_date = dates)
-
-
-
+  bind_cols(gifts)
 
 
 # giving data for households with one person
@@ -327,48 +416,72 @@ households_w_one_person <-
   filter(!household_id %in% tmp$household_id) %>% 
   select(household_id, id)
 
-tmp <- tibble(household_id = sample(households_w_one_person$household_id, 
-                                             size = nrow(households_w_one_person)*3, 
-                                             replace = TRUE),
-                       gift_id = sample(1000000:9999999, nrow(households_w_one_person)*3, replace=F)) 
+giving_table <- tibble(household_id = sample(households_w_one_person$household_id, 
+                                    size = nrow(households_w_one_person)*3, 
+                                    replace = TRUE),
+              gift_id = sample(1000000:9999999, nrow(households_w_one_person)*3, replace=F)) 
 
-tmp$credit_type <- "Hard-Credit"
+households_w_one_person <- 
+  households_w_one_person %>% 
+  left_join(giving_table)
 
-# small gifts - 80% of gifts
-summary(round((rexp(nrow(tmp)/2*.8, rate = .05)+1)*10, 0))
-amt <- round((rexp(nrow(tmp)/2*.8, rate = .05)+1)*10, 0)
+households_w_one_person$credit_type <- "Hard-Credit"
 
-# mid size gifts - 20% of gifts
-summary(rnorm(nrow(tmp)/2*.15, mean = 50000, sd = 10000))
-amt <- c(amt, round((rexp(nrow(tmp)/2*.15, rate = .05)+1)*10, 0))
 
-# major gifts 4.5% of gifts 
-summary(round((rexp(nrow(tmp)/2*.045, rate = .1)+10)*10000, 0))
-amt <- c(amt, round((rexp(nrow(tmp)/2*.045, rate = .1)+10)*10000, 0))
+# small gifts - 75% of gifts
+amt <- sample(1:2500, 
+              size = .75*nrow(households_w_one_person), # divide by two because all gifts will be dupliced for hard and soft credit
+              replace = TRUE, 
+              prob = 2500:1)
 
-# principal gifts .5% of gifts 
-summary(round((rexp(nrow(tmp)/2*.005, rate = .1)+10)*10000, 0))
-amt <- c(amt, round((rexp(nrow(tmp)/2*.005, rate = .1)+10)*10000, 0))
+# mid size gifts - 15% of gifts
+amt <- c(amt, 
+         sample(2500:50000, 
+                size = .15*nrow(households_w_one_person), 
+                replace = TRUE, 
+                prob = 50000:2500))
+
+# leadership size gifts - 7% of gifts
+amt <- c(amt, 
+         sample(50000:100000, 
+                size = .07*nrow(households_w_one_person), 
+                replace = TRUE, 
+                prob = 100000:50000))
+
+# major gifts 2.95% of gifts 
+amt <- c(amt,
+         sample(100000:1000000, 
+                size = .0295*nrow(households_w_one_person), 
+                replace = TRUE, 
+                prob = 1000000:100000))
+
+# major gifts .05% of gifts 
+amt <- c(amt,
+         sample(1000000:10000000, 
+                size = .0005*nrow(households_w_one_person), 
+                replace = TRUE, 
+                prob = 10000000:1000000))
 
 # put amounts in random order
-amt <- sample(amt, size = length(amt), replace = TRUE)
+amt <- sample(amt, size = length(amt), replace = FALSE)
 
-# double amounts for shared households
-amt <- c(amt,amt)
+gifts <- tibble(gift_amt = amt,
+                gift_date = sample(seq(start_date, end_date, by = "day"), length(amt), replace = TRUE))
 
-if(nrow(tmp) > length(amt)) amt <- c(amt, rep(100, nrow(tmp) - length(amt)))
+# make number of rows in giving table which length of amt vector by adding necessary number of $100 gifts to amount
+if(nrow(households_w_one_person) > nrow(gifts)){
+  gifts <- bind_rows(gifts, 
+                     tibble(
+                       gift_amt = rep(100, nrow(households_w_one_person) - nrow(gifts)),
+                       gift_date = end_date))
+}
 
-amt <- sort(amt)
-
-tmp <- 
-  tmp %>% 
+households_w_one_person <- 
+  households_w_one_person %>% 
   arrange(gift_id) %>% 
-  mutate(gift_amt = amt) %>% 
-  mutate(gift_date = sample(seq(start_date, end_date, by = "day"), nrow(tmp), replace = TRUE)) %>% 
-  left_join(households_w_one_person) 
-  
+  bind_cols(gifts)
 
-giving_table <- bind_rows(giving_table, tmp)
+giving_table <- bind_rows(households_w_one_person, households_w_two_people)
 
 giving_table <- filter(giving_table, !is.na(gift_id))
 
@@ -379,41 +492,28 @@ write_csv(giving_table, "giving_data_table.csv")
 
 
 
+# Engagement/Prospect Table (individual level) ----
+# Included variables
+# Id
+# Last contact date 
+# Number of personal contacts - correlate with total giving
+# Assigned - 
+# Solicitor
+# Event attendance
+# Volunteer activities
+# Count of events attended in last five years
+# Digital readership/engagement metric 
+
+# Data science questions/activities to be built in
+# Prospect and Engagement Table
+# Prospects assigned to former employees
+# Errors in date entry (event attended dates in future)
+# Prospects assigned to multiple gift officers
+# Misspelled volunteer activities that throw off counts, etc. 
+# Prospects who are assigned but have not been contacted in over a year
+# Scoring / MG Model -> create personas/profiles 
+# Engagement score calculation
+# Identification new location to host an event
 
 
-  # Data science questions/activities to be built in
-  # Not all people in bio table are in gift table
-  # Who are non-donors? 
-  #   0’s vs NAs
-  # Difference between cash, pledges, pledge payments
-  # What is the first gift date for the individual, household, group? With/without soft-credit?
-  #   First gift, last gift, largest gift 
-  # Splits and designations
-  # Calendar year giving vs. fiscal year giving
-  
-  # Engagement/Prospect Table (individual level) ----
-  # Included variables
-  # Id
-  # Last contact date 
-  # Number of personal contacts
-  # Assigned
-  # Solicitor
-  # Event attendance
-  # Volunteer activities
-  # Count of events attended in last five years
-  # Digital readership/engagement metric 
-  
-  # Data science questions/activities to be built in
-  # Prospect and Engagement Table
-  # Prospects assigned to former employees
-  # Errors in date entry (event attended dates in future)
-  # Prospects assigned to multiple gift officers
-  # Misspelled volunteer activities that throw off counts, etc. 
-  # Prospects who are assigned but have not been contacted in over a year
-  # Scoring / MG Model -> create personas/profiles 
-  # Engagement score calculation
-  # Identification new location to host an event
-  
-  
-  
-  
+

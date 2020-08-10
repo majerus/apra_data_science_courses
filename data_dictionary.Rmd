@@ -1,0 +1,38 @@
+---
+title: "Data Dictionary"
+subtitle: "APRA Data Science Courses"
+date: "`r Sys.Date()`"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+## Introduction
+
+
+## Biographical Data
+
+This project is available on [GitHub](https://github.com/majerus/apra_data_science_courses)
+
+```{r}
+# load tidyverse library 
+library(tidyverse)
+
+# read in biographical data from .csv file on github
+bio <- read_csv("https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/bio_data_table.csv")
+```
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
