@@ -1,9 +1,11 @@
 ---
 title: "Data Dictionary"
-subtitle: "APRA Data Science Courses"
+subtitle: APRA Data Science Courses
 date: "`r Sys.Date()`"
-output: html_notebook
-editor_options: 
+output:
+  html_document:
+    df_print: paged
+editor_options:
   chunk_output_type: inline
 ---
 
@@ -11,53 +13,152 @@ editor_options:
 
 This project is available on [GitHub](https://github.com/majerus/apra_data_science_courses).
 
+fictious data, produced by generate R script
+
 Challenges built in
-## Biographical Data
+
+## Biographical Data {.tabset}
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, error=FALSE)
+
+```
 
 ```{r}
 # load tidyverse library 
 library(tidyverse)
+library(knitr)
+library(plotly)
+library(DT)
 
-# read in biographical data from .csv file on github
-bio <- read_csv("https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/bio_data_table.csv")
+# read in biographical data from .csv file on github into a data frame in R called bio
+# bio <- read_csv("https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/bio_data_table.csv")
+bio <- read_csv("bio_data_table.csv")
+```
+
+The biographical data has `r ncol(bio)` variables and `r nrow(bio)` observations. The data is stored at the donor level. Each row of the data represents a unique donor and biographical information about that donor.  
+
+### Numeric Variables
+
+```{r, echo=FALSE}
+# select only numeric variables from bio
+numeric_variables <- 
+  bio %>% 
+  select_if(is.numeric) 
+```
+
+There are `r ncol(numeric_variables)` numeric variables:
+
+- **id**: A seven digit numeric id that is unique to each donor.  
+- **household_id**: A seven digit numeric id that is unique to households. More than one donor may share a household_id. 
+- **lat**: The latitude of the center point of each donor's zipcode. Missing for donor's residing outside the United States.  
+- **lon**: The longitude of the center point of each donor's zipcode. Missing for donor's residing outside the United States.
+
+```{r}
+# select and glimpse only numeric variables
+bio %>% 
+  select_if(is.numeric) %>% 
+  glimpse()
 
 ```
 
-The biographical data has the following variables:    
+### Character Variables {.tabset .tabset-fade .tabset-pills}
 
-- id: A seven digit numeric id that is unique to each donor.  
+```{r, echo=FALSE}
+# select only numeric variables from bio
+character_variables <- 
+  bio %>% 
+  select_if(is.character) 
+```
+
+When loaded by default there are `r ncol(character_variables)` character variables:
+
 - name: Each donor's first and last name formatted as "last name, first name".
-- household_id: A seven digit numeric id that is unique to households. More than one donor may share a household_id. 
-- deceased: A binary indicator that indicates if a donor is deceased ("Y"|"N")
 - country: Each donor's country of residence. 
 - city: Each donor's city of residence. 
-- birthday: The date of each donor's birth stored as a date variable.
+- deceased: A binary indicator that indicates if a donor is deceased ("Y"|"N")
 - zip: The five digit zipcode of donor's whose country of residence is the United States. 
 - state: The two-letter state abbreviation for each donor whose country of residence is the United States. 
-- lat: The latitude of the center point of each donor's zipcode. Missing for donor's residing outside the United States.  
-- lon: The longitude of the center point of each donor's zipcode. Missing for donor's residing outside the United States.
 - capacity: Each donor's capacity represented within an estimated range. 
 - capacity_source: A categorical variable indicating how the capacity was determined ("institutional"|"screening").
+- race: a categorical variable indicating the donor's race. 
 
 ```{r}
-
-glimpse(bio)
+# select and glimpse only character variables
+bio %>% 
+  select_if(is.character) %>%  
+  glimpse()
 
 ```
 
-
-
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
-```{r}
-plot(cars)
+```{r, echo=FALSE,include = FALSE}
+# You need this code to conduct the magic dependences attaching...
+# I usually forget this!!! But it is needed for generating DT tables in loops, etc. 
+datatable(NULL)
+plot_ly(mtcars)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+```{r results='asis'}
+# select character variables to be included in tables and plots
+chars <- 
+  bio %>% 
+  select_if(is.character) %>% 
+  select(-name, -city, -zip) %>% 
+  colnames() 
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+# loop to create table and plot of counts of each character variable
+# could replace this with purrr
+for (i in chars) {
+  
+  current <- character_variables[, i]
+  
+  cat(paste("\n\n####", i, "\n"))
+  
+  print(htmltools::tagList(
+    current %>%
+      count(.data[[i]]) %>%
+      datatable(rownames = FALSE),
+    
+    ggplotly(
+      ggplot(current, aes_string(x = i)) +
+        geom_bar(fill = '#1f77b4') +
+        theme_minimal())
+    
+  ))
+  
+}
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 
+```
+
+### Date Variables {.tabset .tabset-fade .tabset-pills}
+
+```{r, echo=FALSE}
+# select only numeric variables from bio
+date_variables <- 
+  bio %>% 
+  select_if(function(x) inherits(x, 'Date'))
+```
+
+There is `r ncol(date_variables)` date variable:
+
+- birthday: The date of each donor's birth stored as a date variable.
+
+```{r}
+# select and glimpse only date variable(s)
+bio %>% 
+  select_if(function(x) inherits(x, 'Date')) %>% 
+  glimpse()
+
+```
+
+```{r results='asis'}
+# select character variables to be included in tables and plots
+ggplotly(
+  ggplot(date_variables, aes(x = birthday)) +
+    geom_histogram(fill = '#1f77b4') +
+    theme_minimal())
+
+
+```

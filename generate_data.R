@@ -7,13 +7,16 @@
 # Each data table will be available as a .csv, Excel, and a table in a database. 
 
 
+# to do
+  # make address data match for donors that share a household
+    # build address info at household id level
+
+
 # setup----
 
 # load libraries
 library(tidyverse)
 library(randomNames)
-library(zipcode)
-library(purrr)
 library(lubridate)
 
 # helper functions
@@ -304,7 +307,6 @@ bio_table <-
   # add NAs
   mutate_at(.vars = vars(deceased, capacity, capacity_source, birthday),
             .funs = insert_NAs) 
-
 
 write_csv(bio_table, "bio_data_table.csv")
 
