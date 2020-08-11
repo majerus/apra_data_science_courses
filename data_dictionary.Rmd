@@ -9,21 +9,53 @@ editor_options:
   chunk_output_type: inline
 ---
 
-## Introduction
-
-This project is available on [GitHub](https://github.com/majerus/apra_data_science_courses).
-
-fictious data, produced by generate R script
-
-Challenges built in
-
-## Biographical Data {.tabset}
-
 ```{r setup, include=FALSE}
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, error=FALSE)
 
 ```
+
+#  {.tabset .tabset-fade .tabset-pills} 
+
+## Introduction 
+
+This document describes the data created for [APRA's](https://www.aprahome.org/) fundraising data science online learning courses and workshops. All of the data created for these purposes is fictitious. 
+
+There are three data sets available as of `r Sys.Date()`: 
+
+- Biographical (donor level)
+- Giving  (gift level)
+- Engagement (donor level)
+
+Each of these tables and the variables contained within each are described below. There are tabs included throughout the document that can be used to explore the variables included in each data set. 
+
+These data sets are designed to mirror realistic fundraising data and are not intended to be perfectly "clean" data. 
+There are common fundraising data challenges built into the data files. For example, you can click on the `Biographical Data` tab above to learn more about that data set. 
+
+All of the code for this project is available on [GitHub](https://github.com/majerus/apra_data_science_courses). The code that generates the data sets can be found in the [generate_data.R](https://github.com/majerus/apra_data_science_courses/blob/master/generate_data.R) r script. 
+
+The individual datasets can be read into R directly from github as follows.
+
+```{r echo=TRUE, eval=FALSE}
+
+# load the tidyverse library
+library(tidyverse)
+
+# read bio data csv into R and store in a data frame named bio
+bio <- read_csv("https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/bio_data_table.csv")
+
+# read giving data csv into R and store in a data frame named giving
+giving <- read_csv("https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/giving_data_table.csv")
+
+# read engagement data csv into R and store in a data frame named engage
+#bio <- read_csv("https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/bio_data_table.csv")
+
+```
+
+
+
+## Biographical Data {.tabset}
+
 
 ```{r}
 # load tidyverse library 
@@ -37,7 +69,7 @@ library(DT)
 bio <- read_csv("bio_data_table.csv")
 ```
 
-The biographical data has `r ncol(bio)` variables and `r nrow(bio)` observations. The data is stored at the donor level. Each row of the data represents a unique donor and biographical information about that donor.  
+The biographical data has `r ncol(bio)` variables and `r prettyNum(nrow(bio), big.mark=",")` observations. The data is stored at the donor level. Each row of the data represents a unique donor and biographical information about that donor.  
 
 ### Numeric Variables
 
@@ -162,3 +194,5 @@ ggplotly(
 
 
 ```
+
+## Giving Data {.tabset}
