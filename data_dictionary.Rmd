@@ -9,10 +9,10 @@ editor_options:
 
 ## Introduction
 
+This project is available on [GitHub](https://github.com/majerus/apra_data_science_courses).
 
+Challenges built in
 ## Biographical Data
-
-This project is available on [GitHub](https://github.com/majerus/apra_data_science_courses)
 
 ```{r}
 # load tidyverse library 
@@ -20,7 +20,32 @@ library(tidyverse)
 
 # read in biographical data from .csv file on github
 bio <- read_csv("https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/bio_data_table.csv")
+
 ```
+
+The biographical data has the following variables:    
+
+- id: A seven digit numeric id that is unique to each donor.  
+- name: Each donor's first and last name formatted as "last name, first name".
+- household_id: A seven digit numeric id that is unique to households. More than one donor may share a household_id. 
+- deceased: A binary indicator that indicates if a donor is deceased ("Y"|"N")
+- country: Each donor's country of residence. 
+- city: Each donor's city of residence. 
+- birthday: The date of each donor's birth stored as a date variable.
+- zip: The five digit zipcode of donor's whose country of residence is the United States. 
+- state: The two-letter state abbreviation for each donor whose country of residence is the United States. 
+- lat: The latitude of the center point of each donor's zipcode. Missing for donor's residing outside the United States.  
+- lon: The longitude of the center point of each donor's zipcode. Missing for donor's residing outside the United States.
+- capacity: Each donor's capacity represented within an estimated range. 
+- capacity_source: A categorical variable indicating how the capacity was determined ("institutional"|"screening").
+
+```{r}
+
+glimpse(bio)
+
+```
+
+
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 

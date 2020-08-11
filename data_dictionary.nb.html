@@ -1772,19 +1772,61 @@ $(document).ready(function () {
 <!-- rnb-text-begin -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-</div>
-<div id="biographical-data" class="section level2">
-<h2>Biographical Data</h2>
-<p>This project is available on <a href="https://github.com/majerus/apra_data_science_courses">GitHub</a></p>
+<p>This project is available on <a href="https://github.com/majerus/apra_data_science_courses">GitHub</a>.</p>
+<p>Challenges built in ## Biographical Data</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsb2FkIHRpZHl2ZXJzZSBsaWJyYXJ5IFxubGlicmFyeSh0aWR5dmVyc2UpXG5cbiMgcmVhZCBpbiBiaW9ncmFwaGljYWwgZGF0YSBmcm9tIC5jc3YgZmlsZSBvbiBnaXRodWJcbmJpbyA8LSByZWFkX2NzdihcImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9tYWplcnVzL2FwcmFfZGF0YV9zY2llbmNlX2NvdXJzZXMvbWFzdGVyL2Jpb19kYXRhX3RhYmxlLmNzdlwiKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsb2FkIHRpZHl2ZXJzZSBsaWJyYXJ5IFxubGlicmFyeSh0aWR5dmVyc2UpXG5cbiMgcmVhZCBpbiBiaW9ncmFwaGljYWwgZGF0YSBmcm9tIC5jc3YgZmlsZSBvbiBnaXRodWJcbmJpbyA8LSByZWFkX2NzdihcImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9tYWplcnVzL2FwcmFfZGF0YV9zY2llbmNlX2NvdXJzZXMvbWFzdGVyL2Jpb19kYXRhX3RhYmxlLmNzdlwiKVxuXG5gYGAifQ== -->
 <pre class="r"><code># load tidyverse library 
 library(tidyverse)
 
 # read in biographical data from .csv file on github
-bio &lt;- read_csv(&quot;https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/bio_data_table.csv&quot;)</code></pre>
+bio &lt;- read_csv(&quot;https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/bio_data_table.csv&quot;)
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The biographical data has the following variables:</p>
+<ul>
+<li>id: A seven digit numeric id that is unique to each donor.<br />
+</li>
+<li>name: Each donor’s first and last name formatted as “last name, first name”.</li>
+<li>household_id: A seven digit numeric id that is unique to households. More than one donor may share a household_id.</li>
+<li>deceased: A binary indicator that indicates if a donor is deceased (“Y”|“N”)</li>
+<li>country: Each donor’s country of residence.</li>
+<li>city: Each donor’s city of residence.</li>
+<li>birthday: The date of each donor’s birth stored as a date variable.</li>
+<li>zip: The five digit zipcode of donor’s whose country of residence is the United States.</li>
+<li>state: The two-letter state abbreviation for each donor whose country of residence is the United States.</li>
+<li>lat: The latitude of the center point of each donor’s zipcode. Missing for donor’s residing outside the United States.<br />
+</li>
+<li>lon: The longitude of the center point of each donor’s zipcode. Missing for donor’s residing outside the United States.</li>
+<li>capacity: Each donor’s capacity represented within an estimated range.</li>
+<li>capacity_source: A categorical variable indicating how the capacity was determined (“institutional”|“screening”).</li>
+</ul>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2xpbXBzZShiaW8pXG5cbmBgYCJ9 -->
+<pre class="r"><code>glimpse(bio)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUm93czogMTAwLDAwMFxuQ29sdW1uczogMTNcbiQgaWQgICAgICAgICAgICAgIFx1MDAxYlszbVx1MDAxYlszODs1OzI0Nm08ZGJsPlx1MDAxYlszOW1cdTAwMWJbMjNtIDQyMTg4MjksIDIzMjM5NTgsIDEwMDY2NDgsIDgwNjY4MjQsIDQwNDkyNjksIDQ0NTExNzAsIDM5ODE1NTQsIDMwOTbigKZcbiQgbmFtZSAgICAgICAgICAgIFx1MDAxYlszbVx1MDAxYlszODs1OzI0Nm08Y2hyPlx1MDAxYlszOW1cdTAwMWJbMjNtIFwiYWwtQmFyaSwgSHVtYWlkYWFuXCIsIFwiRmVybmFuZGV6LCBMdWlzb3ZpY2hcIiwgXCJCcm93biwgTmljaGVsbGVcIiwgXCJa4oCmXG4kIGhvdXNlaG9sZF9pZCAgICBcdTAwMWJbM21cdTAwMWJbMzg7NTsyNDZtPGRibD5cdTAwMWJbMzltXHUwMDFiWzIzbSAxMDAwMDQyLCAxMDAwMjE0LCAxMDAwMjE0LCAxMDAwMjk0LCAxMDAwMjk0LCAxMDAwMzA5LCAxMDAwMzA5LCAxMDAw4oCmXG4kIGRlY2Vhc2VkICAgICAgICBcdTAwMWJbM21cdTAwMWJbMzg7NTsyNDZtPGNocj5cdTAwMWJbMzltXHUwMDFiWzIzbSBcIk5cIiwgXCJZXCIsIFwiTlwiLCBcIk5cIiwgXCJOXCIsIFwiTlwiLCBcIk5cIiwgXCJOXCIsIFwiTlwiLCBcIllcIiwgXCJZXCIsIFwiTlwiLCBcIk5cIiwgXCJO4oCmXG4kIGNvdW50cnkgICAgICAgICBcdTAwMWJbM21cdTAwMWJbMzg7NTsyNDZtPGNocj5cdTAwMWJbMzltXHUwMDFiWzIzbSBcIlVuaXRlZCBTdGF0ZXNcIiwgXCJVbml0ZWQgU3RhdGVzXCIsIFwiVW5pdGVkIFN0YXRlc1wiLCBcIlVuaXRlZCBTdGF0ZXNcIizigKZcbiQgY2l0eSAgICAgICAgICAgIFx1MDAxYlszbVx1MDAxYlszODs1OzI0Nm08Y2hyPlx1MDAxYlszOW1cdTAwMWJbMjNtIFwiVGFob2thXCIsIFwiV2luc3RvbiBzYWxlbVwiLCBcIlRheWxvclwiLCBcIlJvc2VuYmVyZ1wiLCBcIkFybGluZ3RvbiBoZWlnaHTigKZcbiQgYmlydGhkYXkgICAgICAgIFx1MDAxYlszbVx1MDAxYlszODs1OzI0Nm08ZGF0ZT5cdTAwMWJbMzltXHUwMDFiWzIzbSAxOTE4LTA3LTA4LCAxOTE4LTA3LTIyLCAxOTE4LTA3LTIyLCAxOTE4LTA3LTI5LCAxOTE4LTA3LTMwLCAxOTE4LTDigKZcbiQgemlwICAgICAgICAgICAgIFx1MDAxYlszbVx1MDAxYlszODs1OzI0Nm08Y2hyPlx1MDAxYlszOW1cdTAwMWJbMjNtIFwiNzkzNzNcIiwgXCIyNzEwNVwiLCBcIjQ4MTgwXCIsIFwiNzc0NzFcIiwgXCI2MDAwNFwiLCBcIjM3NzM4XCIsIFwiNjQ4MzVcIiwgXCI5NTDigKZcbiQgc3RhdGUgICAgICAgICAgIFx1MDAxYlszbVx1MDAxYlszODs1OzI0Nm08Y2hyPlx1MDAxYlszOW1cdTAwMWJbMjNtIFwiVFhcIiwgXCJOQ1wiLCBcIk1JXCIsIFwiVFhcIiwgXCJJTFwiLCBcIlROXCIsIFwiTU9cIiwgXCJDQVwiLCBcIkFaXCIsIFwiQ09cIiwgXCJDQVwiLCBcIuKAplxuJCBsYXQgICAgICAgICAgICAgXHUwMDFiWzNtXHUwMDFiWzM4OzU7MjQ2bTxkYmw+XHUwMDFiWzM5bVx1MDAxYlsyM20gMzMuMTYsIDM2LjEwLCA0Mi4yMiwgMjkuNTQsIDQyLjA5LCAzNS43MiwgMzcuMTUsIDM3LjA0LCAzMy42MSwgMzkuNeKAplxuJCBsb24gICAgICAgICAgICAgXHUwMDFiWzNtXHUwMDFiWzM4OzU7MjQ2bTxkYmw+XHUwMDFiWzM5bVx1MDAxYlsyM20gLTEwMS43OSwgLTgwLjI0LCAtODMuMjYsIC05NS43OSwgLTg3Ljk4LCAtODMuNDksIC05NC40MywgLTEyMi4xMCwgLeKAplxuJCBjYXBhY2l0eSAgICAgICAgXHUwMDFiWzNtXHUwMDFiWzM4OzU7MjQ2bTxjaHI+XHUwMDFiWzM5bVx1MDAxYlsyM20gXCIkMTBrIC0gJDI1a1wiLCBcIj4kMWtcIiwgTkEsIFwiJDUwMGsgLSAkNzUwa1wiLCBcIiQyNWsgLSAkNTBrXCIsIFwiJDIuNWsgLeKAplxuJCBjYXBhY2l0eV9zb3VyY2UgXHUwMDFiWzNtXHUwMDFiWzM4OzU7MjQ2bTxjaHI+XHUwMDFiWzM5bVx1MDAxYlsyM20gXCJpbnN0aXR1dGlvbmFsXCIsIFwic2NyZWVuaW5nXCIsIFwic2NyZWVuaW5nXCIsIFwiaW5zdGl0dXRpb25hbFwiLCBcInNjcmVlbuKAplxuIn0= -->
+<pre><code>Rows: 100,000
+Columns: 13
+$ id              [3m[38;5;246m&lt;dbl&gt;[39m[23m 4218829, 2323958, 1006648, 8066824, 4049269, 4451170, 3981554, 3096…
+$ name            [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;al-Bari, Humaidaan&quot;, &quot;Fernandez, Luisovich&quot;, &quot;Brown, Nichelle&quot;, &quot;Z…
+$ household_id    [3m[38;5;246m&lt;dbl&gt;[39m[23m 1000042, 1000214, 1000214, 1000294, 1000294, 1000309, 1000309, 1000…
+$ deceased        [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;N&quot;, &quot;Y&quot;, &quot;N&quot;, &quot;N&quot;, &quot;N&quot;, &quot;N&quot;, &quot;N&quot;, &quot;N&quot;, &quot;N&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;N&quot;, &quot;N&quot;, &quot;N…
+$ country         [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;United States&quot;, &quot;United States&quot;, &quot;United States&quot;, &quot;United States&quot;,…
+$ city            [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;Tahoka&quot;, &quot;Winston salem&quot;, &quot;Taylor&quot;, &quot;Rosenberg&quot;, &quot;Arlington height…
+$ birthday        [3m[38;5;246m&lt;date&gt;[39m[23m 1918-07-08, 1918-07-22, 1918-07-22, 1918-07-29, 1918-07-30, 1918-0…
+$ zip             [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;79373&quot;, &quot;27105&quot;, &quot;48180&quot;, &quot;77471&quot;, &quot;60004&quot;, &quot;37738&quot;, &quot;64835&quot;, &quot;950…
+$ state           [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;TX&quot;, &quot;NC&quot;, &quot;MI&quot;, &quot;TX&quot;, &quot;IL&quot;, &quot;TN&quot;, &quot;MO&quot;, &quot;CA&quot;, &quot;AZ&quot;, &quot;CO&quot;, &quot;CA&quot;, &quot;…
+$ lat             [3m[38;5;246m&lt;dbl&gt;[39m[23m 33.16, 36.10, 42.22, 29.54, 42.09, 35.72, 37.15, 37.04, 33.61, 39.5…
+$ lon             [3m[38;5;246m&lt;dbl&gt;[39m[23m -101.79, -80.24, -83.26, -95.79, -87.98, -83.49, -94.43, -122.10, -…
+$ capacity        [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;$10k - $25k&quot;, &quot;&gt;$1k&quot;, NA, &quot;$500k - $750k&quot;, &quot;$25k - $50k&quot;, &quot;$2.5k -…
+$ capacity_source [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;institutional&quot;, &quot;screening&quot;, &quot;screening&quot;, &quot;institutional&quot;, &quot;screen…</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>This is an <a href="http://rmarkdown.rstudio.com">R Markdown</a> Notebook. When you execute code within the notebook, the results appear beneath the code.</p>
@@ -1802,7 +1844,7 @@ bio &lt;- read_csv(&quot;https://raw.githubusercontent.com/majerus/apra_data_sci
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiRGF0YSBEaWN0aW9uYXJ5IgpzdWJ0aXRsZTogIkFQUkEgRGF0YSBTY2llbmNlIENvdXJzZXMiCmRhdGU6ICJgciBTeXMuRGF0ZSgpYCIKb3V0cHV0OiBodG1sX25vdGVib29rCmVkaXRvcl9vcHRpb25zOiAKICBjaHVua19vdXRwdXRfdHlwZTogaW5saW5lCi0tLQoKIyMgSW50cm9kdWN0aW9uCgoKIyMgQmlvZ3JhcGhpY2FsIERhdGEKClRoaXMgcHJvamVjdCBpcyBhdmFpbGFibGUgb24gW0dpdEh1Yl0oaHR0cHM6Ly9naXRodWIuY29tL21hamVydXMvYXByYV9kYXRhX3NjaWVuY2VfY291cnNlcykKCmBgYHtyfQojIGxvYWQgdGlkeXZlcnNlIGxpYnJhcnkgCmxpYnJhcnkodGlkeXZlcnNlKQoKIyByZWFkIGluIGJpb2dyYXBoaWNhbCBkYXRhIGZyb20gLmNzdiBmaWxlIG9uIGdpdGh1YgpiaW8gPC0gcmVhZF9jc3YoImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9tYWplcnVzL2FwcmFfZGF0YV9zY2llbmNlX2NvdXJzZXMvbWFzdGVyL2Jpb19kYXRhX3RhYmxlLmNzdiIpCmBgYAoKVGhpcyBpcyBhbiBbUiBNYXJrZG93bl0oaHR0cDovL3JtYXJrZG93bi5yc3R1ZGlvLmNvbSkgTm90ZWJvb2suIFdoZW4geW91IGV4ZWN1dGUgY29kZSB3aXRoaW4gdGhlIG5vdGVib29rLCB0aGUgcmVzdWx0cyBhcHBlYXIgYmVuZWF0aCB0aGUgY29kZS4gCgpUcnkgZXhlY3V0aW5nIHRoaXMgY2h1bmsgYnkgY2xpY2tpbmcgdGhlICpSdW4qIGJ1dHRvbiB3aXRoaW4gdGhlIGNodW5rIG9yIGJ5IHBsYWNpbmcgeW91ciBjdXJzb3IgaW5zaWRlIGl0IGFuZCBwcmVzc2luZyAqQ21kK1NoaWZ0K0VudGVyKi4gCgpgYGB7cn0KcGxvdChjYXJzKQpgYGAKCkFkZCBhIG5ldyBjaHVuayBieSBjbGlja2luZyB0aGUgKkluc2VydCBDaHVuayogYnV0dG9uIG9uIHRoZSB0b29sYmFyIG9yIGJ5IHByZXNzaW5nICpDbWQrT3B0aW9uK0kqLgoKV2hlbiB5b3Ugc2F2ZSB0aGUgbm90ZWJvb2ssIGFuIEhUTUwgZmlsZSBjb250YWluaW5nIHRoZSBjb2RlIGFuZCBvdXRwdXQgd2lsbCBiZSBzYXZlZCBhbG9uZ3NpZGUgaXQgKGNsaWNrIHRoZSAqUHJldmlldyogYnV0dG9uIG9yIHByZXNzICpDbWQrU2hpZnQrSyogdG8gcHJldmlldyB0aGUgSFRNTCBmaWxlKS4gCgpUaGUgcHJldmlldyBzaG93cyB5b3UgYSByZW5kZXJlZCBIVE1MIGNvcHkgb2YgdGhlIGNvbnRlbnRzIG9mIHRoZSBlZGl0b3IuIENvbnNlcXVlbnRseSwgdW5saWtlICpLbml0KiwgKlByZXZpZXcqIGRvZXMgbm90IHJ1biBhbnkgUiBjb2RlIGNodW5rcy4gSW5zdGVhZCwgdGhlIG91dHB1dCBvZiB0aGUgY2h1bmsgd2hlbiBpdCB3YXMgbGFzdCBydW4gaW4gdGhlIGVkaXRvciBpcyBkaXNwbGF5ZWQuCgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiRGF0YSBEaWN0aW9uYXJ5IgpzdWJ0aXRsZTogIkFQUkEgRGF0YSBTY2llbmNlIENvdXJzZXMiCmRhdGU6ICJgciBTeXMuRGF0ZSgpYCIKb3V0cHV0OiBodG1sX25vdGVib29rCmVkaXRvcl9vcHRpb25zOiAKICBjaHVua19vdXRwdXRfdHlwZTogaW5saW5lCi0tLQoKIyMgSW50cm9kdWN0aW9uCgpUaGlzIHByb2plY3QgaXMgYXZhaWxhYmxlIG9uIFtHaXRIdWJdKGh0dHBzOi8vZ2l0aHViLmNvbS9tYWplcnVzL2FwcmFfZGF0YV9zY2llbmNlX2NvdXJzZXMpLgoKQ2hhbGxlbmdlcyBidWlsdCBpbgojIyBCaW9ncmFwaGljYWwgRGF0YQoKYGBge3J9CiMgbG9hZCB0aWR5dmVyc2UgbGlicmFyeSAKbGlicmFyeSh0aWR5dmVyc2UpCgojIHJlYWQgaW4gYmlvZ3JhcGhpY2FsIGRhdGEgZnJvbSAuY3N2IGZpbGUgb24gZ2l0aHViCmJpbyA8LSByZWFkX2NzdigiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL21hamVydXMvYXByYV9kYXRhX3NjaWVuY2VfY291cnNlcy9tYXN0ZXIvYmlvX2RhdGFfdGFibGUuY3N2IikKCmBgYAoKVGhlIGJpb2dyYXBoaWNhbCBkYXRhIGhhcyB0aGUgZm9sbG93aW5nIHZhcmlhYmxlczogICAgCgotIGlkOiBBIHNldmVuIGRpZ2l0IG51bWVyaWMgaWQgdGhhdCBpcyB1bmlxdWUgdG8gZWFjaCBkb25vci4gIAotIG5hbWU6IEVhY2ggZG9ub3IncyBmaXJzdCBhbmQgbGFzdCBuYW1lIGZvcm1hdHRlZCBhcyAibGFzdCBuYW1lLCBmaXJzdCBuYW1lIi4KLSBob3VzZWhvbGRfaWQ6IEEgc2V2ZW4gZGlnaXQgbnVtZXJpYyBpZCB0aGF0IGlzIHVuaXF1ZSB0byBob3VzZWhvbGRzLiBNb3JlIHRoYW4gb25lIGRvbm9yIG1heSBzaGFyZSBhIGhvdXNlaG9sZF9pZC4gCi0gZGVjZWFzZWQ6IEEgYmluYXJ5IGluZGljYXRvciB0aGF0IGluZGljYXRlcyBpZiBhIGRvbm9yIGlzIGRlY2Vhc2VkICgiWSJ8Ik4iKQotIGNvdW50cnk6IEVhY2ggZG9ub3IncyBjb3VudHJ5IG9mIHJlc2lkZW5jZS4gCi0gY2l0eTogRWFjaCBkb25vcidzIGNpdHkgb2YgcmVzaWRlbmNlLiAKLSBiaXJ0aGRheTogVGhlIGRhdGUgb2YgZWFjaCBkb25vcidzIGJpcnRoIHN0b3JlZCBhcyBhIGRhdGUgdmFyaWFibGUuCi0gemlwOiBUaGUgZml2ZSBkaWdpdCB6aXBjb2RlIG9mIGRvbm9yJ3Mgd2hvc2UgY291bnRyeSBvZiByZXNpZGVuY2UgaXMgdGhlIFVuaXRlZCBTdGF0ZXMuIAotIHN0YXRlOiBUaGUgdHdvLWxldHRlciBzdGF0ZSBhYmJyZXZpYXRpb24gZm9yIGVhY2ggZG9ub3Igd2hvc2UgY291bnRyeSBvZiByZXNpZGVuY2UgaXMgdGhlIFVuaXRlZCBTdGF0ZXMuIAotIGxhdDogVGhlIGxhdGl0dWRlIG9mIHRoZSBjZW50ZXIgcG9pbnQgb2YgZWFjaCBkb25vcidzIHppcGNvZGUuIE1pc3NpbmcgZm9yIGRvbm9yJ3MgcmVzaWRpbmcgb3V0c2lkZSB0aGUgVW5pdGVkIFN0YXRlcy4gIAotIGxvbjogVGhlIGxvbmdpdHVkZSBvZiB0aGUgY2VudGVyIHBvaW50IG9mIGVhY2ggZG9ub3IncyB6aXBjb2RlLiBNaXNzaW5nIGZvciBkb25vcidzIHJlc2lkaW5nIG91dHNpZGUgdGhlIFVuaXRlZCBTdGF0ZXMuCi0gY2FwYWNpdHk6IEVhY2ggZG9ub3IncyBjYXBhY2l0eSByZXByZXNlbnRlZCB3aXRoaW4gYW4gZXN0aW1hdGVkIHJhbmdlLiAKLSBjYXBhY2l0eV9zb3VyY2U6IEEgY2F0ZWdvcmljYWwgdmFyaWFibGUgaW5kaWNhdGluZyBob3cgdGhlIGNhcGFjaXR5IHdhcyBkZXRlcm1pbmVkICgiaW5zdGl0dXRpb25hbCJ8InNjcmVlbmluZyIpLgoKYGBge3J9CgpnbGltcHNlKGJpbykKCmBgYAoKCgpUaGlzIGlzIGFuIFtSIE1hcmtkb3duXShodHRwOi8vcm1hcmtkb3duLnJzdHVkaW8uY29tKSBOb3RlYm9vay4gV2hlbiB5b3UgZXhlY3V0ZSBjb2RlIHdpdGhpbiB0aGUgbm90ZWJvb2ssIHRoZSByZXN1bHRzIGFwcGVhciBiZW5lYXRoIHRoZSBjb2RlLiAKClRyeSBleGVjdXRpbmcgdGhpcyBjaHVuayBieSBjbGlja2luZyB0aGUgKlJ1biogYnV0dG9uIHdpdGhpbiB0aGUgY2h1bmsgb3IgYnkgcGxhY2luZyB5b3VyIGN1cnNvciBpbnNpZGUgaXQgYW5kIHByZXNzaW5nICpDbWQrU2hpZnQrRW50ZXIqLiAKCmBgYHtyfQpwbG90KGNhcnMpCmBgYAoKQWRkIGEgbmV3IGNodW5rIGJ5IGNsaWNraW5nIHRoZSAqSW5zZXJ0IENodW5rKiBidXR0b24gb24gdGhlIHRvb2xiYXIgb3IgYnkgcHJlc3NpbmcgKkNtZCtPcHRpb24rSSouCgpXaGVuIHlvdSBzYXZlIHRoZSBub3RlYm9vaywgYW4gSFRNTCBmaWxlIGNvbnRhaW5pbmcgdGhlIGNvZGUgYW5kIG91dHB1dCB3aWxsIGJlIHNhdmVkIGFsb25nc2lkZSBpdCAoY2xpY2sgdGhlICpQcmV2aWV3KiBidXR0b24gb3IgcHJlc3MgKkNtZCtTaGlmdCtLKiB0byBwcmV2aWV3IHRoZSBIVE1MIGZpbGUpLiAKClRoZSBwcmV2aWV3IHNob3dzIHlvdSBhIHJlbmRlcmVkIEhUTUwgY29weSBvZiB0aGUgY29udGVudHMgb2YgdGhlIGVkaXRvci4gQ29uc2VxdWVudGx5LCB1bmxpa2UgKktuaXQqLCAqUHJldmlldyogZG9lcyBub3QgcnVuIGFueSBSIGNvZGUgY2h1bmtzLiBJbnN0ZWFkLCB0aGUgb3V0cHV0IG9mIHRoZSBjaHVuayB3aGVuIGl0IHdhcyBsYXN0IHJ1biBpbiB0aGUgZWRpdG9yIGlzIGRpc3BsYXllZC4KCg==</div>
 
 
 
