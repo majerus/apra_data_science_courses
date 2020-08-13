@@ -151,9 +151,13 @@ bio %>%
   select_if(is.character)
 ```
 
-**Which variable is should not be a character?**
+**Which variable is but should not be a character?**
 
 ```{r}
+
+bio %>% 
+  select_if(is.character)  
+
 bio <-
   bio %>% 
   mutate(zip = as.numeric(zip))
@@ -220,7 +224,7 @@ bio %>%
   gather("variable", "value") %>% 
   ggplot(aes(x = value)) +
   geom_bar() +
-  facet_wrap(~variable, scales = "free", nrow = 2) +
+  facet_wrap(~variable, scales = "free", nrow = 7) +
   theme(axis.text.y = element_text(size = 6)) +
   coord_flip()
 ```
@@ -381,7 +385,8 @@ giving %>%
 
 
 ```{r}
-calculateFY <- function(date = Sys.Date(), date.format = "%Y-%m-%d", ytd = FALSE, fiscal.year = 2020){ 
+calculateFY <- function(date = Sys.Date(), date.format = "%Y-%m-%d", ytd = FALSE, 
+                        fiscal.year = ifelse(month(Sys.Date()) >= 7,  year(Sys.Date()) +1, year(Sys.Date()))){ 
   
   date <- as.Date(date, date.format)
   
