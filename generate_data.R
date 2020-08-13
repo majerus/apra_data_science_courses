@@ -622,11 +622,11 @@ engagement_table <-
                                  prob = 1000:1, 
                                  replace = TRUE)
         
-        x$last_contact <- insert_NAs(x$last_contact, p =.1)
+        x$last_contact <- insert_NAs(x$last_contact, p =.25)
         x$numer_of_contacts <- insert_NAs(x$numer_of_contacts, p =.1)
         x$gift_officer <- insert_NAs(x$gift_officer, p =.96)   
         x$event <- insert_NAs(x$event, p =.1)
-        x$volunteer <- insert_NAs(x$volunteer, p =.1)
+        x$volunteer <- insert_NAs(x$volunteer, p =.9)
         x$interests <- insert_NAs(x$interests, p =.3)
         x$time_on_site <- insert_NAs(x$time_on_site, p =.8)    
         
@@ -666,11 +666,11 @@ engagement_table <-
             lapply(x$id, function(y) paste(sample(interests, sample(1:5), replace = FALSE), collapse = ",")))
         
         
-        x$last_contact <- insert_NAs(x$last_contact, p =.4)
+        x$last_contact <- insert_NAs(x$last_contact, p =.8)
         x$numer_of_contacts <- insert_NAs(x$numer_of_contacts, p =.4)
         x$gift_officer <- insert_NAs(x$gift_officer, p =.98)  
         x$event <- insert_NAs(x$event, p =.1)
-        x$volunteer <- insert_NAs(x$volunteer, p =.1)
+        x$volunteer <- insert_NAs(x$volunteer, p =.95)
         x$interests <- insert_NAs(x$interests, p =.6)
         x$time_on_site <- insert_NAs(x$time_on_site, p =.8)    
         
@@ -682,6 +682,7 @@ engagement_table <-
     
   )
 
+engagement_table$total_giving <- NULL
 
 write_csv(engagement_table, "engagement_data_table.csv")
 

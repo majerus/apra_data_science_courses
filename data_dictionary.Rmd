@@ -11,7 +11,7 @@ editor_options:
 <style>
 
 a {
-  color: #F48B1F;
+color: #F48B1F;
 }
 
 
@@ -31,8 +31,8 @@ htmltools::img(src = "https://www.aprahome.org/media/1481225393/sys1header.png",
                style = 'position:absolute; top:0; right:0; padding:10px;')
 
 # APRA colors from logo:
-  # orange: #F48B1F
-  # black:  #58585A
+# orange: #F48B1F
+# black:  #58585A
 
 ```
 
@@ -219,8 +219,6 @@ ggplotly(
 
 ## Giving Data {.tabset}
 
-
-
 ```{r}
 # read in giving data from .csv 
 giving <- read_csv("giving_data_table.csv")
@@ -257,10 +255,10 @@ giving %>%
 # select character variables to be included in tables and plots
 ggplotly(
   ggplot(data = transform(giving, bins = cut(gift_amt, 
-                                               breaks = c(0, 2500, 50000, 100000, 1000000, 10000000),
-                                               labels = c("$0 - $2,500", "$2,500 - $50,000", 
-                                                          "$50,000 - $100,000", "$100,000 - $1,000,000", 
-                                                          "$1,000,000 - $10,000,000"))), 
+                                             breaks = c(0, 2500, 50000, 100000, 1000000, 10000000),
+                                             labels = c("$0 - $2,500", "$2,500 - $50,000", 
+                                                        "$50,000 - $100,000", "$100,000 - $1,000,000", 
+                                                        "$1,000,000 - $10,000,000"))), 
          aes(x = bins)) +
     geom_bar(fill = '#F48B1F') +
     theme_minimal() +
@@ -337,6 +335,156 @@ ggplotly(
 ```
 
 
-## Engagement Data
+## Engagement Data{.tabset}
 
+```{r}
+# read in giving data from .csv 
+engagement <- read_csv("engagement_data_table.csv")
+```
+
+The engagement data has `r ncol(engagement)` variables and `r prettyNum(nrow(engagement), big.mark=",")` observations. The data is stored at the donor level. Each row of the data represents a unique donor and attributes associated with that donor.  
+
+### Numeric Variables{.tabset .tabset-fade .tabset-pills}
+
+```{r, echo=FALSE}
+# select only numeric variables from bio
+numeric_variables <- 
+  engagement %>% 
+  select_if(is.numeric) 
+```
+
+There are `r ncol(numeric_variables)` numeric variables:
+
+- **id**: A seven digit numeric id that is unique to each donor.
+- **number_of_contacts**: Number of direct contacts that the donor has had with an advancement representive in the last five years. 
+- **volunteer**: Binary variable indicating if a donor has volunteered in the last five years (0 = No, 1 = Yes).
+- **time_on_site**: The number of minutes the donor has spent on the organization's website. 
+
+```{r}
+# select and glimpse only numeric variables
+engagement %>% 
+  select_if(is.numeric) %>% 
+  glimpse()
+
+```
+
+
+```{r results='asis'}
+# select numeric variables to be included in tables and plots
+numerics <- 
+  engagement %>% 
+  select_if(is.numeric) %>% 
+  select(-id) %>% 
+  colnames() 
+
+# loop to create table and plot of counts of each character variable
+# could replace this with purrr
+for (i in numerics) {
+  
+  current <- engagement[, i]
+  
+  cat(paste("\n\n####", i, "\n"))
+  
+  print(htmltools::tagList(
+    current %>%
+      summarise(
+        min = round(min(.data[[i]], na.rm = TRUE), 1),
+        median = round(median(.data[[i]], na.rm = TRUE), 1),
+        mean = round(mean(.data[[i]], na.rm = TRUE), 1),
+        max = round(max(.data[[i]], na.rm = TRUE), 1),
+        sd = round(sd(.data[[i]], na.rm = TRUE), 1)) %>% 
+      datatable(rownames = FALSE, height = 200),
+    
+    ggplotly(
+      ggplot(current, aes_string(x = i)) +
+        geom_bar(fill = '#F48B1F') +
+        theme_minimal())
+    
+  ))
+  
+}
+
+```
+
+### Character Variables {.tabset .tabset-fade .tabset-pills}
+
+```{r, echo=FALSE}
+# select only numeric variables from bio
+character_variables <- 
+  engagement %>% 
+  select_if(is.character) 
+```
+
+There are `r ncol(character_variables)` character variable:
+
+- gift_officer: The gift officer currently assigned to the donor.
+- event: Has the donor attended an event in the last year. 
+- interests: set of the donor's known interests. 
+
+```{r}
+# select and glimpse only character variables
+engagement %>% 
+  select_if(is.character) %>%  
+  glimpse()
+```
+
+
+```{r results='asis'}
+# select character variables to be included in tables and plots
+chars <- 
+  engagement %>% 
+  select_if(is.character) %>% 
+  colnames() 
+
+
+for (i in chars) {
+  
+  current <- engagement[, i]
+  
+  cat(paste("\n\n####", i, "\n"))
+  
+  print(
+  current %>%
+    count_(i) %>%
+    kable()
+  )
+}
+
+
+
+
+```
+
+
+
+### Date Variables {.tabset .tabset-fade .tabset-pills}
+
+```{r, echo=FALSE}
+# select only numeric variables from bio
+date_variables <- 
+  engagement %>% 
+  select_if(function(x) inherits(x, 'Date'))
+```
+
+There is `r ncol(date_variables)` date variable:
+
+- last_contact: The date that the donor was last in contact with a representative of the advancement office. 
+
+```{r}
+# select and glimpse only date variable(s)
+engagement %>% 
+  select_if(function(x) inherits(x, 'Date')) %>% 
+  glimpse()
+
+```
+
+```{r results='asis'}
+# select character variables to be included in tables and plots
+ggplotly(
+  ggplot(date_variables, aes(x = last_contact)) +
+    geom_histogram(fill = '#F48B1F') +
+    theme_minimal())
+
+
+```
 
