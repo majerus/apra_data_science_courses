@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2020-08-11" />
+<meta name="date" content="2020-08-12" />
 
 <title>Data Dictionary</title>
 
@@ -1746,43 +1746,60 @@ summary {
 
 <h1 class="title toc-ignore">Data Dictionary</h1>
 <h3 class="subtitle">APRA Data Science Courses</h3>
-<h4 class="date">2020-08-11</h4>
+<h4 class="date">2020-08-12</h4>
 
 </div>
 
 
 <!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<div id="section" class="section level1 tabset tabset-fade tabset-pills">
+<h1></h1>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>This project is available on <a href="https://github.com/majerus/apra_data_science_courses">GitHub</a>.</p>
-<p>fictious data, produced by generate R script</p>
-<p>Challenges built in</p>
+<p>This document describes the data created for <a href="https://www.aprahome.org/">APRA’s</a> fundraising data science online learning courses and workshops. All of the data created for these purposes is fictitious.</p>
+<p>There are three data sets available as of 2020-08-12:</p>
+<ul>
+<li>Biographical (donor level)</li>
+<li>Giving (gift level)</li>
+<li>Engagement (donor level)</li>
+</ul>
+<p>Each of these tables and the variables contained within each are described below. There are tabs included throughout the document that can be used to explore the variables included in each data set.</p>
+<p>These data sets are designed to mirror realistic fundraising data and are not intended to be perfectly “clean” data. There are common fundraising data challenges built into the data files. For example, you can click on the <code>Biographical Data</code> tab above to learn more about that data set.</p>
+<p>All of the code for this project is available on <a href="https://github.com/majerus/apra_data_science_courses">GitHub</a>. The code that generates the data sets can be found in the <a href="https://github.com/majerus/apra_data_science_courses/blob/master/generate_data.R">generate_data.R</a> r script.</p>
+<p>The individual datasets can be read into R directly from github as follows.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIiMgbG9hZCB0aGUgdGlkeXZlcnNlIGxpYnJhcnkiLCJsaWJyYXJ5KHRpZHl2ZXJzZSkiLCIiLCIjIHJlYWQgYmlvIGRhdGEgY3N2IGludG8gUiBhbmQgc3RvcmUgaW4gYSBkYXRhIGZyYW1lIG5hbWVkIGJpbyIsImJpbyA8LSByZWFkX2NzdihcImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9tYWplcnVzL2FwcmFfZGF0YV9zY2llbmNlX2NvdXJzZXMvbWFzdGVyL2Jpb19kYXRhX3RhYmxlLmNzdlwiKSIsIiIsIiMgcmVhZCBnaXZpbmcgZGF0YSBjc3YgaW50byBSIGFuZCBzdG9yZSBpbiBhIGRhdGEgZnJhbWUgbmFtZWQgZ2l2aW5nIiwiZ2l2aW5nIDwtIHJlYWRfY3N2KFwiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL21hamVydXMvYXByYV9kYXRhX3NjaWVuY2VfY291cnNlcy9tYXN0ZXIvZ2l2aW5nX2RhdGFfdGFibGUuY3N2XCIpIiwiIiwiIyByZWFkIGVuZ2FnZW1lbnQgZGF0YSBjc3YgaW50byBSIGFuZCBzdG9yZSBpbiBhIGRhdGEgZnJhbWUgbmFtZWQgZW5nYWdlIiwiI2JpbyA8LSByZWFkX2NzdihcImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9tYWplcnVzL2FwcmFfZGF0YV9zY2llbmNlX2NvdXJzZXMvbWFzdGVyL2Jpb19kYXRhX3RhYmxlLmNzdlwiKSJdfQ== -->
+<pre class="r"><code># load the tidyverse library
+library(tidyverse)
+
+# read bio data csv into R and store in a data frame named bio
+bio &lt;- read_csv(&quot;https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/bio_data_table.csv&quot;)
+
+# read giving data csv into R and store in a data frame named giving
+giving &lt;- read_csv(&quot;https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/giving_data_table.csv&quot;)
+
+# read engagement data csv into R and store in a data frame named engage
+#bio &lt;- read_csv(&quot;https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/bio_data_table.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 </div>
 <div id="biographical-data" class="section level2 tabset">
 <h2>Biographical Data</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsb2FkIHRpZHl2ZXJzZSBsaWJyYXJ5IFxubGlicmFyeSh0aWR5dmVyc2UpXG5cbiMgcmVhZCBpbiBiaW9ncmFwaGljYWwgZGF0YSBmcm9tIC5jc3YgZmlsZSBvbiBnaXRodWJcbmJpbyA8LSByZWFkX2NzdihcImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9tYWplcnVzL2FwcmFfZGF0YV9zY2llbmNlX2NvdXJzZXMvbWFzdGVyL2Jpb19kYXRhX3RhYmxlLmNzdlwiKVxuXG5gYGAifQ== -->
-<pre class="r"><code># load tidyverse library 
-library(tidyverse)
-
-# read in biographical data from .csv file on github
-bio &lt;- read_csv(&quot;https://raw.githubusercontent.com/majerus/apra_data_science_courses/master/bio_data_table.csv&quot;)
-</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>The biographical data has 14 variables and 100000 observations. The data is stored at the donor level. Each row of the data represents a unique donor and biographical information about that donor.</p>
+<p>The biographical data has 14 variables and 100,000 observations. The data is stored at the donor level. Each row of the data represents a unique donor and biographical information about that donor.</p>
 <div id="numeric-variables" class="section level3">
 <h3>Numeric Variables</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBzZWxlY3Qgb25seSBudW1lcmljIHZhcmlhYmxlcyBmcm9tIGJpb1xuYmlvICU+JSBcbiAgc2VsZWN0X2lmKGlzLm51bWVyaWMpICU+JSBcbiAgZ2xpbXBzZSgpXG5gYGAifQ== -->
-<pre class="r"><code># select only numeric variables from bio
-bio %&gt;% 
-  select_if(is.numeric) %&gt;% 
-  glimpse()</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>There are 4 numeric variables:</p>
@@ -1796,30 +1813,135 @@ bio %&gt;%
 </ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5nbGltcHNlKG51bWVyaWNfdmFyaWFibGVzKVxuXG5gYGAifQ== -->
-<pre class="r"><code>
-glimpse(numeric_variables)
-</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
+<div id="character-variables" class="section level3 tabset tabset-fade tabset-pills">
+<h3>Character Variables</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>When loaded by default there are 1 character variables:</p>
 <ul>
-<li><p>name: Each donor’s first and last name formatted as “last name, first name”.</p></li>
-<li><p>deceased: A binary indicator that indicates if a donor is deceased (“Y”|“N”)</p></li>
-<li><p>country: Each donor’s country of residence.</p></li>
-<li><p>city: Each donor’s city of residence.</p></li>
-<li><p>birthday: The date of each donor’s birth stored as a date variable.</p></li>
-<li><p>zip: The five digit zipcode of donor’s whose country of residence is the United States.</p></li>
-<li><p>state: The two-letter state abbreviation for each donor whose country of residence is the United States.</p></li>
-<li><p>capacity: Each donor’s capacity represented within an estimated range.</p></li>
-<li><p>capacity_source: A categorical variable indicating how the capacity was determined (“institutional”|“screening”).</p></li>
-<li><p>race: a categorical variable indicating the donor’s race.</p></li>
+<li>name: Each donor’s first and last name formatted as “last name, first name”.</li>
+<li>country: Each donor’s country of residence.</li>
+<li>city: Each donor’s city of residence.</li>
+<li>deceased: A binary indicator that indicates if a donor is deceased (“Y”|“N”)</li>
+<li>zip: The five digit zipcode of donor’s whose country of residence is the United States.</li>
+<li>state: The two-letter state abbreviation for each donor whose country of residence is the United States.</li>
+<li>capacity: Each donor’s capacity represented within an estimated range.</li>
+<li>capacity_source: A categorical variable indicating how the capacity was determined (“institutional”|“screening”).</li>
+<li>race: a categorical variable indicating the donor’s race.</li>
 </ul>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="date-variables" class="section level3 tabset tabset-fade tabset-pills">
+<h3>Date Variables</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>There is 1 date variable:</p>
+<ul>
+<li>birthday: The date of each donor’s birth stored as a date variable.</li>
+</ul>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+<div id="giving-data" class="section level2 tabset">
+<h2>Giving Data</h2>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The giving data has 6 variables and 540,000 observations. The data is stored at the gift level. Each row of the data represents a unique gift and attributes associated with that gift.</p>
+<div id="numeric-variables-1" class="section level3">
+<h3>Numeric Variables</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>There are 4 numeric variables:</p>
+<ul>
+<li><strong>id</strong>: A seven digit numeric id that is unique to each donor, but can repeat in the giving data for donors with more than one gift.<br />
+</li>
+<li><strong>household_id</strong>: A seven digit numeric id that is unique to households.</li>
+<li><strong>gift_id</strong>: A seven digit numeric id that is unique to each gift.<br />
+</li>
+<li><strong>gift_amt</strong>: The total gift amount received (i.e., total about of cash received in USD).</li>
+</ul>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="character-variables-1" class="section level3 tabset tabset-fade tabset-pills">
+<h3>Character Variables</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>When loaded by default there is 1 character variable:</p>
+<ul>
+<li>credit_type: A categorical variable that indicates if a gift is counted as hard-credit or soft-credit.</li>
+</ul>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="date-variables-1" class="section level3 tabset tabset-fade tabset-pills">
+<h3>Date Variables</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>There is 1 date variable:</p>
+<ul>
+<li>gift_date: The date that each gift was received.</li>
+</ul>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+<div id="engagement-data" class="section level2">
+<h2>Engagement Data</h2>
 <!-- rnb-text-end -->
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiRGF0YSBEaWN0aW9uYXJ5IgpzdWJ0aXRsZTogIkFQUkEgRGF0YSBTY2llbmNlIENvdXJzZXMiCmRhdGU6ICJgciBTeXMuRGF0ZSgpYCIKb3V0cHV0OiBodG1sX25vdGVib29rCmVkaXRvcl9vcHRpb25zOiAKICBjaHVua19vdXRwdXRfdHlwZTogaW5saW5lCi0tLQoKIyMgSW50cm9kdWN0aW9uCgpUaGlzIHByb2plY3QgaXMgYXZhaWxhYmxlIG9uIFtHaXRIdWJdKGh0dHBzOi8vZ2l0aHViLmNvbS9tYWplcnVzL2FwcmFfZGF0YV9zY2llbmNlX2NvdXJzZXMpLgoKZmljdGlvdXMgZGF0YSwgcHJvZHVjZWQgYnkgZ2VuZXJhdGUgUiBzY3JpcHQKCkNoYWxsZW5nZXMgYnVpbHQgaW4KCiMjIEJpb2dyYXBoaWNhbCBEYXRhIHsudGFic2V0fQoKYGBge3J9CiMgbG9hZCB0aWR5dmVyc2UgbGlicmFyeSAKbGlicmFyeSh0aWR5dmVyc2UpCgojIHJlYWQgaW4gYmlvZ3JhcGhpY2FsIGRhdGEgZnJvbSAuY3N2IGZpbGUgb24gZ2l0aHViIGludG8gYSBkYXRhIGZyYW1lIGluIFIgY2FsbGVkIGJpbwojIGJpbyA8LSByZWFkX2NzdigiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL21hamVydXMvYXByYV9kYXRhX3NjaWVuY2VfY291cnNlcy9tYXN0ZXIvYmlvX2RhdGFfdGFibGUuY3N2IikKYmlvIDwtIHJlYWRfY3N2KCJiaW9fZGF0YV90YWJsZS5jc3YiKQpgYGAKClRoZSBiaW9ncmFwaGljYWwgZGF0YSBoYXMgYHIgbmNvbChiaW8pYCB2YXJpYWJsZXMgYW5kIGByIG5yb3coYmlvKWAgb2JzZXJ2YXRpb25zLiBUaGUgZGF0YSBpcyBzdG9yZWQgYXQgdGhlIGRvbm9yIGxldmVsLiBFYWNoIHJvdyBvZiB0aGUgZGF0YSByZXByZXNlbnRzIGEgdW5pcXVlIGRvbm9yIGFuZCBiaW9ncmFwaGljYWwgaW5mb3JtYXRpb24gYWJvdXQgdGhhdCBkb25vci4gIAoKIyMjIE51bWVyaWMgVmFyaWFibGVzCgpgYGB7cn0KIyBzZWxlY3Qgb25seSBudW1lcmljIHZhcmlhYmxlcyBmcm9tIGJpbwpiaW8gJT4lIAogIHNlbGVjdF9pZihpcy5udW1lcmljKSAlPiUgCiAgZ2xpbXBzZSgpCmBgYAoKVGhlcmUgYXJlIGByIG5jb2wobnVtZXJpY192YXJpYWJsZXMpYCBudW1lcmljIHZhcmlhYmxlczoKCi0gKippZCoqOiBBIHNldmVuIGRpZ2l0IG51bWVyaWMgaWQgdGhhdCBpcyB1bmlxdWUgdG8gZWFjaCBkb25vci4gIAotICoqaG91c2Vob2xkX2lkKio6IEEgc2V2ZW4gZGlnaXQgbnVtZXJpYyBpZCB0aGF0IGlzIHVuaXF1ZSB0byBob3VzZWhvbGRzLiBNb3JlIHRoYW4gb25lIGRvbm9yIG1heSBzaGFyZSBhIGhvdXNlaG9sZF9pZC4gCi0gKipsYXQqKjogVGhlIGxhdGl0dWRlIG9mIHRoZSBjZW50ZXIgcG9pbnQgb2YgZWFjaCBkb25vcidzIHppcGNvZGUuIE1pc3NpbmcgZm9yIGRvbm9yJ3MgcmVzaWRpbmcgb3V0c2lkZSB0aGUgVW5pdGVkIFN0YXRlcy4gIAotICoqbG9uKio6IFRoZSBsb25naXR1ZGUgb2YgdGhlIGNlbnRlciBwb2ludCBvZiBlYWNoIGRvbm9yJ3MgemlwY29kZS4gTWlzc2luZyBmb3IgZG9ub3IncyByZXNpZGluZyBvdXRzaWRlIHRoZSBVbml0ZWQgU3RhdGVzLgoKYGBge3J9CgpnbGltcHNlKG51bWVyaWNfdmFyaWFibGVzKQoKYGBgCgoKCgotIG5hbWU6IEVhY2ggZG9ub3IncyBmaXJzdCBhbmQgbGFzdCBuYW1lIGZvcm1hdHRlZCBhcyAibGFzdCBuYW1lLCBmaXJzdCBuYW1lIi4KLSBkZWNlYXNlZDogQSBiaW5hcnkgaW5kaWNhdG9yIHRoYXQgaW5kaWNhdGVzIGlmIGEgZG9ub3IgaXMgZGVjZWFzZWQgKCJZInwiTiIpCi0gY291bnRyeTogRWFjaCBkb25vcidzIGNvdW50cnkgb2YgcmVzaWRlbmNlLiAKLSBjaXR5OiBFYWNoIGRvbm9yJ3MgY2l0eSBvZiByZXNpZGVuY2UuIAotIGJpcnRoZGF5OiBUaGUgZGF0ZSBvZiBlYWNoIGRvbm9yJ3MgYmlydGggc3RvcmVkIGFzIGEgZGF0ZSB2YXJpYWJsZS4KLSB6aXA6IFRoZSBmaXZlIGRpZ2l0IHppcGNvZGUgb2YgZG9ub3IncyB3aG9zZSBjb3VudHJ5IG9mIHJlc2lkZW5jZSBpcyB0aGUgVW5pdGVkIFN0YXRlcy4gCi0gc3RhdGU6IFRoZSB0d28tbGV0dGVyIHN0YXRlIGFiYnJldmlhdGlvbiBmb3IgZWFjaCBkb25vciB3aG9zZSBjb3VudHJ5IG9mIHJlc2lkZW5jZSBpcyB0aGUgVW5pdGVkIFN0YXRlcy4gCgotIGNhcGFjaXR5OiBFYWNoIGRvbm9yJ3MgY2FwYWNpdHkgcmVwcmVzZW50ZWQgd2l0aGluIGFuIGVzdGltYXRlZCByYW5nZS4gCi0gY2FwYWNpdHlfc291cmNlOiBBIGNhdGVnb3JpY2FsIHZhcmlhYmxlIGluZGljYXRpbmcgaG93IHRoZSBjYXBhY2l0eSB3YXMgZGV0ZXJtaW5lZCAoImluc3RpdHV0aW9uYWwifCJzY3JlZW5pbmciKS4KLSByYWNlOiBhIGNhdGVnb3JpY2FsIHZhcmlhYmxlIGluZGljYXRpbmcgdGhlIGRvbm9yJ3MgcmFjZS4gCgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiRGF0YSBEaWN0aW9uYXJ5IgpzdWJ0aXRsZTogQVBSQSBEYXRhIFNjaWVuY2UgQ291cnNlcwpkYXRlOiAiYHIgU3lzLkRhdGUoKWAiCm91dHB1dDoKICBodG1sX25vdGVib29rOgogICAgZGZfcHJpbnQ6IHBhZ2VkCmVkaXRvcl9vcHRpb25zOgogIGNodW5rX291dHB1dF90eXBlOiBpbmxpbmUKLS0tCgpgYGB7ciBzZXR1cCwgZWNobyA9IEZBTFNFfQoKa25pdHI6Om9wdHNfY2h1bmskc2V0KGVjaG8gPSBGQUxTRSwgd2FybmluZyA9IEZBTFNFLCBtZXNzYWdlID0gRkFMU0UsIGVycm9yPUZBTFNFKQoKaHRtbHRvb2xzOjppbWcoc3JjID0gImh0dHBzOi8vd3d3LmFwcmFob21lLm9yZy9tZWRpYS8xNDgxMjI1MzkzL3N5czFoZWFkZXIucG5nIiwgCiAgICAgICAgICAgICAgIGFsdCA9ICdsb2dvJywgCiAgICAgICAgICAgICAgIHN0eWxlID0gJ3Bvc2l0aW9uOmFic29sdXRlOyB0b3A6MDsgcmlnaHQ6MDsgcGFkZGluZzoxMHB4OycpCgojIEFQUkEgY29sb3JzIGZyb20gbG9nbzoKICAjIG9yYW5nZTogI0Y0OEIxRgogICMgYmxhY2s6ICAjNTg1ODVBCgpgYGAKCiMgIHsudGFic2V0IC50YWJzZXQtZmFkZSAudGFic2V0LXBpbGxzfSAKCiMjIEludHJvZHVjdGlvbiAKClRoaXMgZG9jdW1lbnQgZGVzY3JpYmVzIHRoZSBkYXRhIGNyZWF0ZWQgZm9yIFtBUFJBJ3NdKGh0dHBzOi8vd3d3LmFwcmFob21lLm9yZy8pIGZ1bmRyYWlzaW5nIGRhdGEgc2NpZW5jZSBvbmxpbmUgbGVhcm5pbmcgY291cnNlcyBhbmQgd29ya3Nob3BzLiBBbGwgb2YgdGhlIGRhdGEgY3JlYXRlZCBmb3IgdGhlc2UgcHVycG9zZXMgaXMgZmljdGl0aW91cy4gCgpUaGVyZSBhcmUgdGhyZWUgZGF0YSBzZXRzIGF2YWlsYWJsZSBhcyBvZiBgciBTeXMuRGF0ZSgpYDogCgotIEJpb2dyYXBoaWNhbCAoZG9ub3IgbGV2ZWwpCi0gR2l2aW5nICAoZ2lmdCBsZXZlbCkKLSBFbmdhZ2VtZW50IChkb25vciBsZXZlbCkKCkVhY2ggb2YgdGhlc2UgdGFibGVzIGFuZCB0aGUgdmFyaWFibGVzIGNvbnRhaW5lZCB3aXRoaW4gZWFjaCBhcmUgZGVzY3JpYmVkIGJlbG93LiBUaGVyZSBhcmUgdGFicyBpbmNsdWRlZCB0aHJvdWdob3V0IHRoZSBkb2N1bWVudCB0aGF0IGNhbiBiZSB1c2VkIHRvIGV4cGxvcmUgdGhlIHZhcmlhYmxlcyBpbmNsdWRlZCBpbiBlYWNoIGRhdGEgc2V0LiAKClRoZXNlIGRhdGEgc2V0cyBhcmUgZGVzaWduZWQgdG8gbWlycm9yIHJlYWxpc3RpYyBmdW5kcmFpc2luZyBkYXRhIGFuZCBhcmUgbm90IGludGVuZGVkIHRvIGJlIHBlcmZlY3RseSAiY2xlYW4iIGRhdGEuIApUaGVyZSBhcmUgY29tbW9uIGZ1bmRyYWlzaW5nIGRhdGEgY2hhbGxlbmdlcyBidWlsdCBpbnRvIHRoZSBkYXRhIGZpbGVzLiBGb3IgZXhhbXBsZSwgeW91IGNhbiBjbGljayBvbiB0aGUgYEJpb2dyYXBoaWNhbCBEYXRhYCB0YWIgYWJvdmUgdG8gbGVhcm4gbW9yZSBhYm91dCB0aGF0IGRhdGEgc2V0LiAKCkFsbCBvZiB0aGUgY29kZSBmb3IgdGhpcyBwcm9qZWN0IGlzIGF2YWlsYWJsZSBvbiBbR2l0SHViXShodHRwczovL2dpdGh1Yi5jb20vbWFqZXJ1cy9hcHJhX2RhdGFfc2NpZW5jZV9jb3Vyc2VzKS4gVGhlIGNvZGUgdGhhdCBnZW5lcmF0ZXMgdGhlIGRhdGEgc2V0cyBjYW4gYmUgZm91bmQgaW4gdGhlIFtnZW5lcmF0ZV9kYXRhLlJdKGh0dHBzOi8vZ2l0aHViLmNvbS9tYWplcnVzL2FwcmFfZGF0YV9zY2llbmNlX2NvdXJzZXMvYmxvYi9tYXN0ZXIvZ2VuZXJhdGVfZGF0YS5SKSByIHNjcmlwdC4gCgpUaGUgaW5kaXZpZHVhbCBkYXRhc2V0cyBjYW4gYmUgcmVhZCBpbnRvIFIgZGlyZWN0bHkgZnJvbSBnaXRodWIgYXMgZm9sbG93cy4KCmBgYHtyIGVjaG89VFJVRSwgZXZhbD1GQUxTRX0KCgojIGxvYWQgdGhlIHRpZHl2ZXJzZSBsaWJyYXJ5CmxpYnJhcnkodGlkeXZlcnNlKQoKIyByZWFkIGJpbyBkYXRhIGNzdiBpbnRvIFIgYW5kIHN0b3JlIGluIGEgZGF0YSBmcmFtZSBuYW1lZCBiaW8KYmlvIDwtIHJlYWRfY3N2KCJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vbWFqZXJ1cy9hcHJhX2RhdGFfc2NpZW5jZV9jb3Vyc2VzL21hc3Rlci9iaW9fZGF0YV90YWJsZS5jc3YiKQoKIyByZWFkIGdpdmluZyBkYXRhIGNzdiBpbnRvIFIgYW5kIHN0b3JlIGluIGEgZGF0YSBmcmFtZSBuYW1lZCBnaXZpbmcKZ2l2aW5nIDwtIHJlYWRfY3N2KCJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vbWFqZXJ1cy9hcHJhX2RhdGFfc2NpZW5jZV9jb3Vyc2VzL21hc3Rlci9naXZpbmdfZGF0YV90YWJsZS5jc3YiKQoKIyByZWFkIGVuZ2FnZW1lbnQgZGF0YSBjc3YgaW50byBSIGFuZCBzdG9yZSBpbiBhIGRhdGEgZnJhbWUgbmFtZWQgZW5nYWdlCiNiaW8gPC0gcmVhZF9jc3YoImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9tYWplcnVzL2FwcmFfZGF0YV9zY2llbmNlX2NvdXJzZXMvbWFzdGVyL2Jpb19kYXRhX3RhYmxlLmNzdiIpCgpgYGAKCgoKIyMgQmlvZ3JhcGhpY2FsIERhdGEgey50YWJzZXR9CgoKYGBge3J9CiMgbG9hZCB0aWR5dmVyc2UgbGlicmFyeSAKbGlicmFyeSh0aWR5dmVyc2UpCmxpYnJhcnkoa25pdHIpCmxpYnJhcnkocGxvdGx5KQpsaWJyYXJ5KERUKQoKIyByZWFkIGluIGJpb2dyYXBoaWNhbCBkYXRhIGZyb20gLmNzdiBmaWxlIG9uIGdpdGh1YiBpbnRvIGEgZGF0YSBmcmFtZSBpbiBSIGNhbGxlZCBiaW8KIyBiaW8gPC0gcmVhZF9jc3YoImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9tYWplcnVzL2FwcmFfZGF0YV9zY2llbmNlX2NvdXJzZXMvbWFzdGVyL2Jpb19kYXRhX3RhYmxlLmNzdiIpCmJpbyA8LSByZWFkX2NzdigiYmlvX2RhdGFfdGFibGUuY3N2IikKYGBgCgpUaGUgYmlvZ3JhcGhpY2FsIGRhdGEgaGFzIGByIG5jb2woYmlvKWAgdmFyaWFibGVzIGFuZCBgciBwcmV0dHlOdW0obnJvdyhiaW8pLCBiaWcubWFyaz0iLCIpYCBvYnNlcnZhdGlvbnMuIFRoZSBkYXRhIGlzIHN0b3JlZCBhdCB0aGUgZG9ub3IgbGV2ZWwuIEVhY2ggcm93IG9mIHRoZSBkYXRhIHJlcHJlc2VudHMgYSB1bmlxdWUgZG9ub3IgYW5kIGJpb2dyYXBoaWNhbCBpbmZvcm1hdGlvbiBhYm91dCB0aGF0IGRvbm9yLiAgCgojIyMgTnVtZXJpYyBWYXJpYWJsZXMKCmBgYHtyLCBlY2hvPUZBTFNFfQojIHNlbGVjdCBvbmx5IG51bWVyaWMgdmFyaWFibGVzIGZyb20gYmlvCm51bWVyaWNfdmFyaWFibGVzIDwtIAogIGJpbyAlPiUgCiAgc2VsZWN0X2lmKGlzLm51bWVyaWMpIApgYGAKClRoZXJlIGFyZSBgciBuY29sKG51bWVyaWNfdmFyaWFibGVzKWAgbnVtZXJpYyB2YXJpYWJsZXM6CgotICoqaWQqKjogQSBzZXZlbiBkaWdpdCBudW1lcmljIGlkIHRoYXQgaXMgdW5pcXVlIHRvIGVhY2ggZG9ub3IuICAKLSAqKmhvdXNlaG9sZF9pZCoqOiBBIHNldmVuIGRpZ2l0IG51bWVyaWMgaWQgdGhhdCBpcyB1bmlxdWUgdG8gaG91c2Vob2xkcy4gTW9yZSB0aGFuIG9uZSBkb25vciBtYXkgc2hhcmUgYSBob3VzZWhvbGRfaWQuIAotICoqbGF0Kio6IFRoZSBsYXRpdHVkZSBvZiB0aGUgY2VudGVyIHBvaW50IG9mIGVhY2ggZG9ub3IncyB6aXBjb2RlLiBNaXNzaW5nIGZvciBkb25vcidzIHJlc2lkaW5nIG91dHNpZGUgdGhlIFVuaXRlZCBTdGF0ZXMuICAKLSAqKmxvbioqOiBUaGUgbG9uZ2l0dWRlIG9mIHRoZSBjZW50ZXIgcG9pbnQgb2YgZWFjaCBkb25vcidzIHppcGNvZGUuIE1pc3NpbmcgZm9yIGRvbm9yJ3MgcmVzaWRpbmcgb3V0c2lkZSB0aGUgVW5pdGVkIFN0YXRlcy4KCmBgYHtyfQojIHNlbGVjdCBhbmQgZ2xpbXBzZSBvbmx5IG51bWVyaWMgdmFyaWFibGVzCmJpbyAlPiUgCiAgc2VsZWN0X2lmKGlzLm51bWVyaWMpICU+JSAKICBnbGltcHNlKCkKCmBgYAoKIyMjIENoYXJhY3RlciBWYXJpYWJsZXMgey50YWJzZXQgLnRhYnNldC1mYWRlIC50YWJzZXQtcGlsbHN9CgpgYGB7ciwgZWNobz1GQUxTRX0KIyBzZWxlY3Qgb25seSBudW1lcmljIHZhcmlhYmxlcyBmcm9tIGJpbwpjaGFyYWN0ZXJfdmFyaWFibGVzIDwtIAogIGJpbyAlPiUgCiAgc2VsZWN0X2lmKGlzLmNoYXJhY3RlcikgCmBgYAoKV2hlbiBsb2FkZWQgYnkgZGVmYXVsdCB0aGVyZSBhcmUgYHIgbmNvbChjaGFyYWN0ZXJfdmFyaWFibGVzKWAgY2hhcmFjdGVyIHZhcmlhYmxlczoKCi0gbmFtZTogRWFjaCBkb25vcidzIGZpcnN0IGFuZCBsYXN0IG5hbWUgZm9ybWF0dGVkIGFzICJsYXN0IG5hbWUsIGZpcnN0IG5hbWUiLgotIGNvdW50cnk6IEVhY2ggZG9ub3IncyBjb3VudHJ5IG9mIHJlc2lkZW5jZS4gCi0gY2l0eTogRWFjaCBkb25vcidzIGNpdHkgb2YgcmVzaWRlbmNlLiAKLSBkZWNlYXNlZDogQSBiaW5hcnkgaW5kaWNhdG9yIHRoYXQgaW5kaWNhdGVzIGlmIGEgZG9ub3IgaXMgZGVjZWFzZWQgKCJZInwiTiIpCi0gemlwOiBUaGUgZml2ZSBkaWdpdCB6aXBjb2RlIG9mIGRvbm9yJ3Mgd2hvc2UgY291bnRyeSBvZiByZXNpZGVuY2UgaXMgdGhlIFVuaXRlZCBTdGF0ZXMuIAotIHN0YXRlOiBUaGUgdHdvLWxldHRlciBzdGF0ZSBhYmJyZXZpYXRpb24gZm9yIGVhY2ggZG9ub3Igd2hvc2UgY291bnRyeSBvZiByZXNpZGVuY2UgaXMgdGhlIFVuaXRlZCBTdGF0ZXMuIAotIGNhcGFjaXR5OiBFYWNoIGRvbm9yJ3MgY2FwYWNpdHkgcmVwcmVzZW50ZWQgd2l0aGluIGFuIGVzdGltYXRlZCByYW5nZS4gCi0gY2FwYWNpdHlfc291cmNlOiBBIGNhdGVnb3JpY2FsIHZhcmlhYmxlIGluZGljYXRpbmcgaG93IHRoZSBjYXBhY2l0eSB3YXMgZGV0ZXJtaW5lZCAoImluc3RpdHV0aW9uYWwifCJzY3JlZW5pbmciKS4KLSByYWNlOiBhIGNhdGVnb3JpY2FsIHZhcmlhYmxlIGluZGljYXRpbmcgdGhlIGRvbm9yJ3MgcmFjZS4gCgpgYGB7cn0KIyBzZWxlY3QgYW5kIGdsaW1wc2Ugb25seSBjaGFyYWN0ZXIgdmFyaWFibGVzCmJpbyAlPiUgCiAgc2VsZWN0X2lmKGlzLmNoYXJhY3RlcikgJT4lICAKICBnbGltcHNlKCkKCmBgYAoKYGBge3IsIGVjaG89RkFMU0UsaW5jbHVkZSA9IEZBTFNFfQojIFlvdSBuZWVkIHRoaXMgY29kZSB0byBjb25kdWN0IHRoZSBtYWdpYyBkZXBlbmRlbmNlcyBhdHRhY2hpbmcuLi4KIyBJIHVzdWFsbHkgZm9yZ2V0IHRoaXMhISEgQnV0IGl0IGlzIG5lZWRlZCBmb3IgZ2VuZXJhdGluZyBEVCB0YWJsZXMgaW4gbG9vcHMsIGV0Yy4gCmRhdGF0YWJsZShOVUxMKQpwbG90X2x5KG10Y2FycykKYGBgCgpgYGB7ciByZXN1bHRzPSdhc2lzJ30KIyBzZWxlY3QgY2hhcmFjdGVyIHZhcmlhYmxlcyB0byBiZSBpbmNsdWRlZCBpbiB0YWJsZXMgYW5kIHBsb3RzCmNoYXJzIDwtIAogIGJpbyAlPiUgCiAgc2VsZWN0X2lmKGlzLmNoYXJhY3RlcikgJT4lIAogIHNlbGVjdCgtbmFtZSwgLWNpdHksIC16aXApICU+JSAKICBjb2xuYW1lcygpIAoKIyBsb29wIHRvIGNyZWF0ZSB0YWJsZSBhbmQgcGxvdCBvZiBjb3VudHMgb2YgZWFjaCBjaGFyYWN0ZXIgdmFyaWFibGUKIyBjb3VsZCByZXBsYWNlIHRoaXMgd2l0aCBwdXJycgpmb3IgKGkgaW4gY2hhcnMpIHsKICAKICBjdXJyZW50IDwtIGNoYXJhY3Rlcl92YXJpYWJsZXNbLCBpXQogIAogIGNhdChwYXN0ZSgiXG5cbiMjIyMiLCBpLCAiXG4iKSkKICAKICBwcmludChodG1sdG9vbHM6OnRhZ0xpc3QoCiAgICBjdXJyZW50ICU+JQogICAgICBjb3VudCguZGF0YVtbaV1dKSAlPiUKICAgICAgZGF0YXRhYmxlKHJvd25hbWVzID0gRkFMU0UpLAogICAgCiAgICBnZ3Bsb3RseSgKICAgICAgZ2dwbG90KGN1cnJlbnQsIGFlc19zdHJpbmcoeCA9IGkpKSArCiAgICAgICAgZ2VvbV9iYXIoZmlsbCA9ICcjRjQ4QjFGJykgKwogICAgICAgIHRoZW1lX21pbmltYWwoKSkKICAgIAogICkpCiAgCn0KCgpgYGAKCiMjIyBEYXRlIFZhcmlhYmxlcyB7LnRhYnNldCAudGFic2V0LWZhZGUgLnRhYnNldC1waWxsc30KCmBgYHtyLCBlY2hvPUZBTFNFfQojIHNlbGVjdCBvbmx5IG51bWVyaWMgdmFyaWFibGVzIGZyb20gYmlvCmRhdGVfdmFyaWFibGVzIDwtIAogIGJpbyAlPiUgCiAgc2VsZWN0X2lmKGZ1bmN0aW9uKHgpIGluaGVyaXRzKHgsICdEYXRlJykpCmBgYAoKVGhlcmUgaXMgYHIgbmNvbChkYXRlX3ZhcmlhYmxlcylgIGRhdGUgdmFyaWFibGU6CgotIGJpcnRoZGF5OiBUaGUgZGF0ZSBvZiBlYWNoIGRvbm9yJ3MgYmlydGggc3RvcmVkIGFzIGEgZGF0ZSB2YXJpYWJsZS4KCmBgYHtyfQojIHNlbGVjdCBhbmQgZ2xpbXBzZSBvbmx5IGRhdGUgdmFyaWFibGUocykKYmlvICU+JSAKICBzZWxlY3RfaWYoZnVuY3Rpb24oeCkgaW5oZXJpdHMoeCwgJ0RhdGUnKSkgJT4lIAogIGdsaW1wc2UoKQoKYGBgCgpgYGB7ciByZXN1bHRzPSdhc2lzJ30KIyBzZWxlY3QgY2hhcmFjdGVyIHZhcmlhYmxlcyB0byBiZSBpbmNsdWRlZCBpbiB0YWJsZXMgYW5kIHBsb3RzCmdncGxvdGx5KAogIGdncGxvdChkYXRlX3ZhcmlhYmxlcywgYWVzKHggPSBiaXJ0aGRheSkpICsKICAgIGdlb21faGlzdG9ncmFtKGZpbGwgPSAnI0Y0OEIxRicpICsKICAgIHRoZW1lX21pbmltYWwoKSkKCgpgYGAKCiMjIEdpdmluZyBEYXRhIHsudGFic2V0fQoKCgpgYGB7cn0KIyByZWFkIGluIGdpdmluZyBkYXRhIGZyb20gLmNzdiAKZ2l2aW5nIDwtIHJlYWRfY3N2KCJnaXZpbmdfZGF0YV90YWJsZS5jc3YiKQpgYGAKClRoZSBnaXZpbmcgZGF0YSBoYXMgYHIgbmNvbChnaXZpbmcpYCB2YXJpYWJsZXMgYW5kIGByIHByZXR0eU51bShucm93KGdpdmluZyksIGJpZy5tYXJrPSIsIilgIG9ic2VydmF0aW9ucy4gVGhlIGRhdGEgaXMgc3RvcmVkIGF0IHRoZSBnaWZ0IGxldmVsLiBFYWNoIHJvdyBvZiB0aGUgZGF0YSByZXByZXNlbnRzIGEgdW5pcXVlIGdpZnQgYW5kIGF0dHJpYnV0ZXMgYXNzb2NpYXRlZCB3aXRoIHRoYXQgZ2lmdC4gIAoKIyMjIE51bWVyaWMgVmFyaWFibGVzCgpgYGB7ciwgZWNobz1GQUxTRX0KIyBzZWxlY3Qgb25seSBudW1lcmljIHZhcmlhYmxlcyBmcm9tIGJpbwpudW1lcmljX3ZhcmlhYmxlcyA8LSAKICBnaXZpbmcgJT4lIAogIHNlbGVjdF9pZihpcy5udW1lcmljKSAKYGBgCgpUaGVyZSBhcmUgYHIgbmNvbChudW1lcmljX3ZhcmlhYmxlcylgIG51bWVyaWMgdmFyaWFibGVzOgoKLSAqKmlkKio6IEEgc2V2ZW4gZGlnaXQgbnVtZXJpYyBpZCB0aGF0IGlzIHVuaXF1ZSB0byBlYWNoIGRvbm9yLCBidXQgY2FuIHJlcGVhdCBpbiB0aGUgZ2l2aW5nIGRhdGEgZm9yIGRvbm9ycyB3aXRoIG1vcmUgdGhhbiBvbmUgZ2lmdC4gIAotICoqaG91c2Vob2xkX2lkKio6IEEgc2V2ZW4gZGlnaXQgbnVtZXJpYyBpZCB0aGF0IGlzIHVuaXF1ZSB0byBob3VzZWhvbGRzLiAKLSAqKmdpZnRfaWQqKjogQSBzZXZlbiBkaWdpdCBudW1lcmljIGlkIHRoYXQgaXMgdW5pcXVlIHRvIGVhY2ggZ2lmdC4gICAKLSAqKmdpZnRfYW10Kio6IFRoZSB0b3RhbCBnaWZ0IGFtb3VudCByZWNlaXZlZCAoaS5lLiwgdG90YWwgYWJvdXQgb2YgY2FzaCByZWNlaXZlZCBpbiBVU0QpLgoKYGBge3J9CiMgc2VsZWN0IGFuZCBnbGltcHNlIG9ubHkgbnVtZXJpYyB2YXJpYWJsZXMKZ2l2aW5nICU+JSAKICBzZWxlY3RfaWYoaXMubnVtZXJpYykgJT4lIAogIGdsaW1wc2UoKQoKYGBgCgoKYGBge3IgcmVzdWx0cz0nYXNpcyd9CiMgc2VsZWN0IGNoYXJhY3RlciB2YXJpYWJsZXMgdG8gYmUgaW5jbHVkZWQgaW4gdGFibGVzIGFuZCBwbG90cwpnZ3Bsb3RseSgKICBnZ3Bsb3QoZGF0YSA9IHRyYW5zZm9ybShnaXZpbmcsIGJpbnMgPSBjdXQoZ2lmdF9hbXQsIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFrcyA9IGMoMCwgMjUwMCwgNTAwMDAsIDEwMDAwMCwgMTAwMDAwMCwgMTAwMDAwMDApLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxhYmVscyA9IGMoIiQwIC0gJDIsNTAwIiwgIiQyLDUwMCAtICQ1MCwwMDAiLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICIkNTAsMDAwIC0gJDEwMCwwMDAiLCAiJDEwMCwwMDAgLSAkMSwwMDAsMDAwIiwgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiJDEsMDAwLDAwMCAtICQxMCwwMDAsMDAwIikpKSwgCiAgICAgICAgIGFlcyh4ID0gYmlucykpICsKICAgIGdlb21fYmFyKGZpbGwgPSAnI0Y0OEIxRicpICsKICAgIHRoZW1lX21pbmltYWwoKSArCiAgICB0aGVtZShheGlzLnRleHQueCA9IGVsZW1lbnRfdGV4dChhbmdsZSA9IDQ1LCBoanVzdCA9IDEpKSArCiAgICBsYWJzKHRpdGxlID0gIkdpZnQgQW1vdW50IEhpc290cmdyYXBocyIpKQoKYGBgCgojIyMgQ2hhcmFjdGVyIFZhcmlhYmxlcyB7LnRhYnNldCAudGFic2V0LWZhZGUgLnRhYnNldC1waWxsc30KCmBgYHtyLCBlY2hvPUZBTFNFfQojIHNlbGVjdCBvbmx5IG51bWVyaWMgdmFyaWFibGVzIGZyb20gYmlvCmNoYXJhY3Rlcl92YXJpYWJsZXMgPC0gCiAgZ2l2aW5nICU+JSAKICBzZWxlY3RfaWYoaXMuY2hhcmFjdGVyKSAKYGBgCgpXaGVuIGxvYWRlZCBieSBkZWZhdWx0IHRoZXJlIGlzIGByIG5jb2woY2hhcmFjdGVyX3ZhcmlhYmxlcylgIGNoYXJhY3RlciB2YXJpYWJsZToKCi0gY3JlZGl0X3R5cGU6IEEgY2F0ZWdvcmljYWwgdmFyaWFibGUgdGhhdCBpbmRpY2F0ZXMgaWYgYSBnaWZ0IGlzIGNvdW50ZWQgYXMgaGFyZC1jcmVkaXQgb3Igc29mdC1jcmVkaXQuIAoKYGBge3J9CiMgc2VsZWN0IGFuZCBnbGltcHNlIG9ubHkgY2hhcmFjdGVyIHZhcmlhYmxlcwpiaW8gJT4lIAogIHNlbGVjdF9pZihpcy5jaGFyYWN0ZXIpICU+JSAgCiAgZ2xpbXBzZSgpCgpgYGAKCgpgYGB7ciByZXN1bHRzPSdhc2lzJ30KCmdpdmluZyAlPiUgCiAgY291bnQoY3JlZGl0X3R5cGUpICU+JQogIGRhdGF0YWJsZShyb3duYW1lcyA9IEZBTFNFKQoKIyBzZWxlY3QgY2hhcmFjdGVyIHZhcmlhYmxlcyB0byBiZSBpbmNsdWRlZCBpbiB0YWJsZXMgYW5kIHBsb3RzCmdncGxvdGx5KAogIGdncGxvdChnaXZpbmcsIGFlcyh4ID0gY3JlZGl0X3R5cGUpKSArCiAgICBnZW9tX2JhcihmaWxsID0gJyNGNDhCMUYnKSArCiAgICB0aGVtZV9taW5pbWFsKCkpCgpgYGAKCiMjIyBEYXRlIFZhcmlhYmxlcyB7LnRhYnNldCAudGFic2V0LWZhZGUgLnRhYnNldC1waWxsc30KCmBgYHtyLCBlY2hvPUZBTFNFfQojIHNlbGVjdCBvbmx5IG51bWVyaWMgdmFyaWFibGVzIGZyb20gYmlvCmRhdGVfdmFyaWFibGVzIDwtIAogIGdpdmluZyAlPiUgCiAgc2VsZWN0X2lmKGZ1bmN0aW9uKHgpIGluaGVyaXRzKHgsICdEYXRlJykpCmBgYAoKVGhlcmUgaXMgYHIgbmNvbChkYXRlX3ZhcmlhYmxlcylgIGRhdGUgdmFyaWFibGU6CgotIGdpZnRfZGF0ZTogVGhlIGRhdGUgdGhhdCBlYWNoIGdpZnQgd2FzIHJlY2VpdmVkLiAKCmBgYHtyfQojIHNlbGVjdCBhbmQgZ2xpbXBzZSBvbmx5IGRhdGUgdmFyaWFibGUocykKYmlvICU+JSAKICBzZWxlY3RfaWYoZnVuY3Rpb24oeCkgaW5oZXJpdHMoeCwgJ0RhdGUnKSkgJT4lIAogIGdsaW1wc2UoKQoKYGBgCgpgYGB7ciByZXN1bHRzPSdhc2lzJ30KIyBzZWxlY3QgY2hhcmFjdGVyIHZhcmlhYmxlcyB0byBiZSBpbmNsdWRlZCBpbiB0YWJsZXMgYW5kIHBsb3RzCmdncGxvdGx5KAogIGdncGxvdChkYXRlX3ZhcmlhYmxlcywgYWVzKHggPSBnaWZ0X2RhdGUpKSArCiAgICBnZW9tX2hpc3RvZ3JhbShmaWxsID0gJyNGNDhCMUYnKSArCiAgICB0aGVtZV9taW5pbWFsKCkpCgoKYGBgCgoKIyMgRW5nYWdlbWVudCBEYXRhCgoK</div>
 
 
 

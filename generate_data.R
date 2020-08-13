@@ -8,8 +8,9 @@
 
 
 # to do
-  # make address data match for donors that share a household
-    # build address info at household id level
+# make address data match for donors that share a household
+# build address info at household id level
+# correlate giving to capacity
 
 
 # setup----
@@ -20,11 +21,11 @@ library(randomNames)
 library(lubridate)
 
 # helper functions
-# make ~10% of a vector missing
-insert_NAs <- function(x) {
-  len <- length(x)
-  n <- sample(1:floor(0.1*len), 1)
-  i <- sample(1:len, n)
+# make p (10%) of a vector missing
+insert_NAs <- function(x, p = .1) {
+  l <- length(x)
+  n <- p*l
+  i <- sample(1:l, n)
   x[i] <- NA 
   x
 }
@@ -148,7 +149,7 @@ zip_data <-
   mutate(city = paste0(toupper(substr(city, 1, 1)), tolower(substr(city, 2, nchar(city)))))
 
 # birthdays
-  # correlate birthdays with prob of deceased
+# correlate birthdays with prob of deceased
 probs <- 
   tibble(prob_day =  c(rep(.01, 3000), 
                        rep(.05, 3000), 
@@ -177,9 +178,9 @@ probs <-
 
 
 birthday <- tibble(birthday = sort(sample(seq(Sys.Date() - 102*365, Sys.Date() - 20*365, by = "day"), 
-                             prob = probs$prob_day, 
-                             size = bio_records, 
-                             replace = TRUE)))
+                                          prob = probs$prob_day, 
+                                          size = bio_records, 
+                                          replace = TRUE)))
 
 birthday <- 
   birthday %>% 
@@ -187,18 +188,18 @@ birthday <-
   mutate(decade = round(year(birthday), -1))
 
 birthday$deceased <-  
-           birthday$prob_deceased %>%
-           map_chr(~ sample(c("Y", "N"), 
-                            size = 1, 
-                            prob = c(.x, 1-.x),
-                            replace = TRUE))
+  birthday$prob_deceased %>%
+  map_chr(~ sample(c("Y", "N"), 
+                   size = 1, 
+                   prob = c(.x, 1-.x),
+                   replace = TRUE))
 
 # make birthdays random within decade before joining on household id so that households are not compromised of adjacent birthdays
 birthday <-
   birthday %>% 
   group_by(decade) %>% 
   sample_frac(size = 1, replace = FALSE)
-  
+
 
 
 # create bio table
@@ -298,7 +299,7 @@ bio_table$race <-
                   .002,
                   .03),
          replace = TRUE)
-    
+
 # inject missing data 
 bio_table$birthday[bio_table$id %in% sample(bio_table$id, bio_records*.01)] <- as.Date("1/1/1900", "%m/%d/%Y")
 
@@ -395,7 +396,7 @@ amt <- sample(amt, size = length(amt), replace = FALSE)
 
 gifts <- tibble(gift_amt = amt,
                 gift_date = sample(seq(start_date, end_date, by = "day"),length(amt), replace = TRUE))
-                
+
 gifts <- bind_rows(gifts, gifts)
 
 # make number of rows in giving table which length of amt vector by adding necessary number of $100 gifts to amount
@@ -419,9 +420,9 @@ households_w_one_person <-
   select(household_id, id)
 
 giving_table <- tibble(household_id = sample(households_w_one_person$household_id, 
-                                    size = nrow(households_w_one_person)*3, 
-                                    replace = TRUE),
-              gift_id = sample(1000000:9999999, nrow(households_w_one_person)*3, replace=F)) 
+                                             size = nrow(households_w_one_person)*3, 
+                                             replace = TRUE),
+                       gift_id = sample(1000000:9999999, nrow(households_w_one_person)*3, replace=F)) 
 
 households_w_one_person <- 
   households_w_one_person %>% 
@@ -488,7 +489,14 @@ giving_table <- bind_rows(households_w_one_person, households_w_two_people)
 giving_table <- filter(giving_table, !is.na(gift_id))
 
 # make names different to require changing
-colnames(giving_table) <- c("household ID", "ID", "gift id", "credit Type", "gift amt", "gift date")
+#colnames(giving_table) <- c("household ID", "ID", "gift id", "credit Type", "gift amt", "gift date")
+
+
+# reduce number of gifts to create more never donors
+giving_table <- 
+  giving_table %>% 
+  slice(round(.3*nrow(giving_table)):nrow(giving_table))
+
 
 write_csv(giving_table, "giving_data_table.csv")
 
@@ -500,7 +508,6 @@ write_csv(giving_table, "giving_data_table.csv")
 # Last contact date 
 # Number of personal contacts - correlate with total giving
 # Assigned - 
-# Solicitor
 # Event attendance
 # Volunteer activities
 # Count of events attended in last five years
@@ -517,5 +524,165 @@ write_csv(giving_table, "giving_data_table.csv")
 # Engagement score calculation
 # Identification new location to host an event
 
+
+# split out giving data by total giving to create correlations between giving and engagement data
+tmp <- 
+  giving_table %>% 
+  group_by(id) %>% 
+  summarise(total_giving = sum(gift_amt)) %>% 
+  ungroup() 
+
+never_givers <- 
+  bio_table %>% 
+  select(id) %>% 
+  filter(!id %in% tmp$id) %>% 
+  mutate(total_giving = 0)
+
+annual_givers <- 
+  tmp %>% 
+  filter(total_giving < 10000)
+
+leadership_givers <- 
+  tmp %>% 
+  filter(total_giving >= 10000 &
+           total_giving <  50000) 
+
+mid_level_givers <- 
+  tmp %>% 
+  filter(total_giving >= 50000 &
+           total_giving <  100000)
+
+major_givers <- 
+  tmp %>% 
+  filter(total_giving >= 100000 &
+           total_giving < 1000000)
+
+principal_givers <- 
+  tmp %>% 
+  filter(total_giving >= 1000000)
+
+
+# great vector of 20 gift officers
+officers <- randomNames(n = 20)
+
+# create vector of potential interests
+# interests from https://www.businessinsider.com/billionaire-hobbies-of-richest-people-in-the-world-2016-8
+interests <- c("travel", "art", "fashion", "politics", "wine", 
+               "boating/sailing", "health/exercise", "cars", "sports", "reading",
+               "golf", "food/dining/cooking", "hunting/fishing", "skiing")
+
+# combine giving dataframes into a list
+# this list of data frames will be used to create all variables to ensure relationships between giving and engagement variables
+dfList <- list(never_givers, annual_givers, leadership_givers, mid_level_givers, major_givers, principal_givers)
+
+# set counter for lapply call 
+# this tracks the runs through the lapply call
+# used to distinguish between never givers and annual givers and major givers, etc. 
+# probably a better way to do this 
+counter <- (as.numeric(end_date - start_date)/365) - length(dfList) 
+
+# create engagement data based on giving levels
+engagement_table <- 
+  bind_rows(
+    lapply(dfList, function(x) {
+      
+      if(counter >= 0){
+        
+        x$last_contact <- sample(seq(start_date + counter*365, end_date, by = "day"),
+                                 size = nrow(x), 
+                                 prob = c((as.numeric(end_date-start_date) - counter*365): 0), 
+                                 replace = TRUE)
+        
+        x$numer_of_contacts <- sample(1:50,
+                                      size = nrow(x), 
+                                      prob = 50:1, 
+                                      replace = TRUE)
+        
+        x$gift_officer <- sample(officers,
+                                 size = nrow(x), 
+                                 replace = TRUE)
+        
+        x$event <- sample(c("Y", "N"),
+                          size = nrow(x),
+                          prob = c(.6, 4), 
+                          replace = TRUE)
+        
+        x$volunteer <- sample(c(1, 0),
+                              size = nrow(x),
+                              prob = c(.6, 4), 
+                              replace = TRUE)
+        
+        x$interests <- 
+          as.character(
+            lapply(x$id, function(y) paste(sample(interests, sample(1:5), replace = FALSE), collapse = ",")))
+        
+        
+        x$time_on_site <- sample(1:1000,
+                                 size = nrow(x), 
+                                 prob = 1000:1, 
+                                 replace = TRUE)
+        
+        x$last_contact <- insert_NAs(x$last_contact, p =.1)
+        x$numer_of_contacts <- insert_NAs(x$numer_of_contacts, p =.1)
+        x$gift_officer <- insert_NAs(x$gift_officer, p =.96)   
+        x$event <- insert_NAs(x$event, p =.1)
+        x$volunteer <- insert_NAs(x$volunteer, p =.1)
+        x$interests <- insert_NAs(x$interests, p =.3)
+        x$time_on_site <- insert_NAs(x$time_on_site, p =.8)    
+        
+      }else{
+        
+        x$last_contact <- sample(seq(start_date, end_date, by = "day"),
+                                 size = nrow(x), 
+                                 prob = c((as.numeric(end_date-start_date): 0)), 
+                                 replace = TRUE) 
+        
+        x$numer_of_contacts <- sample(0:25,
+                                      size = nrow(x), 
+                                      prob = c(100, rep(1, 25)), 
+                                      replace = TRUE)
+        
+        x$gift_officer <- sample(officers,
+                                 size = nrow(x), 
+                                 replace = TRUE)
+        
+        x$event <- sample(c("Y", "N"),
+                          size = nrow(x), 
+                          prob = c(.3, .7), 
+                          replace = TRUE)
+        
+        x$volunteer <- sample(c(0, 1),
+                              size = nrow(x),
+                              prob = c(.6, 4), 
+                              replace = TRUE)
+        
+        x$time_on_site <- sample(1:1000,
+                                 size = nrow(x), 
+                                 prob = 1000:1, 
+                                 replace = TRUE)
+        
+        x$interests <-           
+          as.character(
+            lapply(x$id, function(y) paste(sample(interests, sample(1:5), replace = FALSE), collapse = ",")))
+        
+        
+        x$last_contact <- insert_NAs(x$last_contact, p =.4)
+        x$numer_of_contacts <- insert_NAs(x$numer_of_contacts, p =.4)
+        x$gift_officer <- insert_NAs(x$gift_officer, p =.98)  
+        x$event <- insert_NAs(x$event, p =.1)
+        x$volunteer <- insert_NAs(x$volunteer, p =.1)
+        x$interests <- insert_NAs(x$interests, p =.6)
+        x$time_on_site <- insert_NAs(x$time_on_site, p =.8)    
+        
+      }
+      
+      counter <<- counter + 1
+      
+      x} )
+    
+  )
+
+
+write_csv(engagement_table, "engagement_data_table.csv")
 
 
