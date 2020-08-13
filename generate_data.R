@@ -489,16 +489,19 @@ giving_table <- bind_rows(households_w_one_person, households_w_two_people)
 giving_table <- filter(giving_table, !is.na(gift_id))
 
 # make names different to require changing
-#colnames(giving_table) <- c("household ID", "ID", "gift id", "credit Type", "gift amt", "gift date")
-
 
 # reduce number of gifts to create more never donors
 giving_table <- 
   giving_table %>% 
   slice(round(.3*nrow(giving_table)):nrow(giving_table))
 
+# create seperate table to write out with strange col names
+# this is done seperately so don't have to deal with column names like this when creating engagement data below 
+giving_table_out <- giving_table
+colnames(giving_table_out) <- c("household ID", "ID", "gift id", "credit Type", "gift amt", "gift date")
 
-write_csv(giving_table, "giving_data_table.csv")
+
+write_csv(giving_table_out, "giving_data_table.csv")
 
 
 
