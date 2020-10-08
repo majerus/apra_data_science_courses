@@ -224,7 +224,7 @@ ggplotly(
 giving <- read_csv("giving_data_table.csv")
 ```
 
-The giving data has `r ncol(giving)` variables and `r prettyNum(nrow(giving), big.mark=",")` observations. The data is stored at the gift level. Each row of the data represents a unique gift and attributes associated with that gift.  
+The giving data has `r ncol(giving)` variables and `r prettyNum(nrow(giving), big.mark=",")` observations. The data is stored at the gift level. Each row of the data represents a gift and attributes associated with that gift. Gift ids may be repeated for hard-credit and soft-credit related to the same gift.  
 
 ### Numeric Variables
 
@@ -237,10 +237,10 @@ numeric_variables <-
 
 There are `r ncol(numeric_variables)` numeric variables:
 
-- **id**: A seven digit numeric id that is unique to each donor, but can repeat in the giving data for donors with more than one gift.  
-- **household_id**: A seven digit numeric id that is unique to households. 
-- **gift_id**: A seven digit numeric id that is unique to each gift.   
-- **gift_amt**: The total gift amount received (i.e., total about of cash received in USD).
+- **ID**: A seven digit numeric id that is unique to each donor, but can repeat in the giving data for donors with more than one gift.  
+- **household ID**: A seven digit numeric id that is unique to households. 
+- **gift id**: A seven digit numeric id that is unique to each gift.   
+- **gift amt**: The total gift amount received (i.e., total amount of cash received in USD).
 
 ```{r}
 # select and glimpse only numeric variables
@@ -254,7 +254,7 @@ giving %>%
 ```{r results='asis'}
 # select character variables to be included in tables and plots
 ggplotly(
-  ggplot(data = transform(giving, bins = cut(gift_amt, 
+  ggplot(data = transform(giving, bins = cut(`gift amt`, 
                                              breaks = c(0, 2500, 50000, 100000, 1000000, 10000000),
                                              labels = c("$0 - $2,500", "$2,500 - $50,000", 
                                                         "$50,000 - $100,000", "$100,000 - $1,000,000", 
@@ -264,6 +264,7 @@ ggplotly(
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     labs(title = "Gift Amount Hisotrgraphs"))
+
 
 ```
 
@@ -278,7 +279,7 @@ character_variables <-
 
 When loaded by default there is `r ncol(character_variables)` character variable:
 
-- credit_type: A categorical variable that indicates if a gift is counted as hard-credit or soft-credit. 
+- credit Type: A categorical variable that indicates if a gift is counted as hard-credit or soft-credit. 
 
 ```{r}
 # select and glimpse only character variables
@@ -292,12 +293,12 @@ bio %>%
 ```{r results='asis'}
 
 giving %>% 
-  count(credit_type) %>%
+  count(`credit Type`) %>%
   datatable(rownames = FALSE)
 
 # select character variables to be included in tables and plots
 ggplotly(
-  ggplot(giving, aes(x = credit_type)) +
+  ggplot(giving, aes(x = `credit Type`)) +
     geom_bar(fill = '#F48B1F') +
     theme_minimal())
 
@@ -314,11 +315,11 @@ date_variables <-
 
 There is `r ncol(date_variables)` date variable:
 
-- gift_date: The date that each gift was received. 
+- gift date: The date that each gift was received. 
 
 ```{r}
 # select and glimpse only date variable(s)
-bio %>% 
+giving %>% 
   select_if(function(x) inherits(x, 'Date')) %>% 
   glimpse()
 
@@ -327,7 +328,7 @@ bio %>%
 ```{r results='asis'}
 # select character variables to be included in tables and plots
 ggplotly(
-  ggplot(date_variables, aes(x = gift_date)) +
+  ggplot(date_variables, aes(x = `gift date`)) +
     geom_histogram(fill = '#F48B1F') +
     theme_minimal())
 

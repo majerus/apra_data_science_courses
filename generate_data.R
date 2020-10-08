@@ -161,8 +161,8 @@ probs <-
                        rep(.15, 3000), 
                        rep(.10, 3000), 
                        # limit last category to match number of days in range of birthdays
-                       rep(.10, abs(as.numeric((Sys.Date() - 102*365) - (Sys.Date() - 20*365) + 9*3000))+1)),         
-         days = seq(Sys.Date() - 102*365, Sys.Date() - 20*365, by = "day"),
+                       rep(.10, abs(as.numeric((Sys.Date() - 110*365) - (Sys.Date() - 18*365) + 9*3000))+1)),         
+         days = seq(Sys.Date() - 110*365, Sys.Date() - 18*365, by = "day"),
          prob_deceased =  c(rep(.95, 3000), 
                             rep(.85, 3000), 
                             rep(.50, 3000), 
@@ -173,32 +173,21 @@ probs <-
                             rep(.05, 3000), 
                             rep(.025, 3000), 
                             # limit last category to match number of days in range of birthdays
-                            rep(.025, abs(as.numeric((Sys.Date() - 102*365) - (Sys.Date() - 20*365) + 9*3000))+1))
+                            rep(.025, abs(as.numeric((Sys.Date() - 110*365) - (Sys.Date() - 18*365) + 9*3000))+1))
   )
 
 
-birthday <- tibble(birthday = sort(sample(seq(Sys.Date() - 102*365, Sys.Date() - 20*365, by = "day"), 
+birthday <- tibble(birthday = sample(seq(Sys.Date() - 102*365, Sys.Date() - 20*365, by = "day"), 
                                           prob = probs$prob_day, 
                                           size = bio_records, 
-                                          replace = TRUE)))
+                                          replace = TRUE))
 
-birthday <- 
-  birthday %>% 
-  left_join(probs, by = c("birthday" = "days")) %>% 
-  mutate(decade = round(year(birthday), -1))
-
-birthday$deceased <-  
-  birthday$prob_deceased %>%
-  map_chr(~ sample(c("Y", "N"), 
-                   size = 1, 
-                   prob = c(.x, 1-.x),
-                   replace = TRUE))
-
-# make birthdays random within decade before joining on household id so that households are not compromised of adjacent birthdays
-birthday <-
-  birthday %>% 
-  group_by(decade) %>% 
-  sample_frac(size = 1, replace = FALSE)
+# 
+# # make birthdays random within decade before joining on household id so that households are not compromised of adjacent birthdays
+# birthday <-
+#   birthday %>% 
+#   group_by(decade) %>% 
+#   sample_frac(size = 1, replace = FALSE)
 
 
 
@@ -206,20 +195,74 @@ birthday <-
 bio_table <- tibble(
   id = id,
   name = randomNames(bio_records),
-  household_id = household_id,
-  country = country_cities_expanded$country,
-  city = country_cities_expanded$city
+  household_id = sort(household_id)
 )
 
-# add birthdays
-bio_table <- 
+country_cities_expanded <-
+  country_cities_expanded %>% 
+  arrange(country, city)
+
+bio_table <-
   bio_table %>% 
-  arrange(household_id) %>% 
-  bind_cols(birthday = birthday$birthday,
-            deceased = birthday$deceased)
+  bind_cols(country_cities_expanded)
+
+# v <- tibble(group = NULL)
+# 
+# for(i in 1:(bio_records/1000)){
+#   v <- bind_rows(v, 
+#                  tibble(group = rep(i, 1000)))
+# }
+# 
+# birthday
+
+# household_ids_for_bdays <- sample_n(tbl = bio_table, size = bio_records, replace = FALSE)
+# 
+# birthday %>%
+#   arrange(birthday) %>%
+#   mutate(household_id = sample_n(bio_table$household_id, nrow(birthday)))
+
+bio_table$dup <- duplicated(bio_table$household_id)
+
+# add birthdays
+bio_table$birthday <- 
+  if_else(bio_table$dup == FALSE, as.Date(birthday$birthday, "%Y-%m-%d"), as.Date(NA))
+
+bio_table$days_diff <- sample(-1000:1000, bio_records, replace = TRUE)
+
+bio_table$birthday <- 
+  if_else(bio_table$dup == TRUE & is.na(bio_table$birthday),
+                        lag(bio_table$birthday) + bio_table$days_diff,
+          bio_table$birthday)
+
+bio_table$days_diff <- NULL
+
+bio_table <-
+  bio_table %>%
+  left_join(probs, by = c("birthday" = "days")) %>%
+  mutate(decade = round(year(birthday), -1))
+
+bio_table$prob_deceased <- ifelse(is.na(bio_table$prob_deceased), .001, bio_table$prob_deceased)
+
+bio_table$deceased <-
+  bio_table$prob_deceased %>%
+  map_chr(~ sample(c("Y", "N"),
+                   size = 1,
+                   prob = c(.x, 1-.x),
+                   replace = TRUE))
+
+bio_table$decade <- NULL
+bio_table$prob_day <- NULL
+bio_table$prob_deceased <- NULL
+
 
 # add zips for domestic addresses
-bio_table$zip <- ifelse(bio_table$country == "United States", zips, NA)
+bio_table$zip <- 
+  ifelse(bio_table$country == "United States" & bio_table$dup == FALSE, zips, NA)
+
+# make zips match within households
+bio_table$zip <- ifelse(bio_table$country == "United States" & bio_table$dup == TRUE & is.na(bio_table$zip),
+                        lag(bio_table$zip),
+                        bio_table$zip)
 
 # join on city, state based on zip
 bio_table <- 
@@ -270,10 +313,19 @@ capacity_ratings <- tibble(
                   .06,
                   .06))
 
-bio_table$capacity <- sample(x = capacity_ratings$rating, 
+
+bio_table$capacity <- ifelse(bio_table$dup == FALSE, 
+                             sample(x = capacity_ratings$rating, 
                              size = bio_records, 
                              prob = capacity_ratings$probability, 
-                             replace = TRUE)
+                             replace = TRUE),
+                             NA)
+
+# make zips match within households
+bio_table$capacity <- ifelse(bio_table$dup == TRUE & is.na(bio_table$capacity),
+                        lag(bio_table$capacity),
+                        bio_table$capacity)
+
 
 bio_table$capacity_source <- sample(x = c("institutional", "screening"), 
                                     size = bio_records, 
@@ -307,7 +359,10 @@ bio_table <-
   bio_table %>% 
   # add NAs
   mutate_at(.vars = vars(deceased, capacity, capacity_source, birthday),
-            .funs = insert_NAs) 
+            .funs = insert_NAs) %>% 
+  arrange(zip)
+
+bio_table$dup <- NULL
 
 write_csv(bio_table, "bio_data_table.csv")
 
@@ -406,6 +461,11 @@ if(nrow(households_w_two_people) > nrow(gifts)){
                        gift_amt = rep(100, nrow(households_w_two_people) - nrow(gifts)),
                        gift_date = end_date))
 }
+
+gifts <- 
+  gifts %>% 
+  arrange(gift_date, gift_amt)
+
 
 households_w_two_people <- 
   households_w_two_people %>% 
